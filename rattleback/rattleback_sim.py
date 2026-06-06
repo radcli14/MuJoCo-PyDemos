@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import os
-# EGL is the default headless backend; set before importing mujoco.
-os.environ.setdefault("MUJOCO_GL", "egl")
+import sys
+# Choose the OpenGL backend before importing mujoco.  macOS has no EGL, so it
+# uses GLFW; Linux defaults to EGL for headless GPU/CPU offscreen rendering.
+# setdefault() means an explicit MUJOCO_GL in the environment still wins.
+os.environ.setdefault("MUJOCO_GL", "glfw" if sys.platform == "darwin" else "egl")
 
 from pathlib import Path
 import numpy as np
@@ -18,7 +21,7 @@ VIDEO_PATH = HERE / "rattleback_sim.mp4"
 PLOT_PATH  = HERE / "rattleback_states.png"
 
 # ── simulation knobs ────────────────────────────────────────────────────────
-SIM_DURATION = 10.0    # seconds — long enough for at least one reversal
+SIM_DURATION = 24.0    # seconds — long enough for at least one reversal
 RENDER_FPS   = 60      # video frame rate
 RENDER_W     = 1280    # video width  (px)
 RENDER_H     = 720     # video height (px)
@@ -28,16 +31,15 @@ RENDER_H     = 720     # video height (px)
 # direction triggers spin reversal; negate if you want the stable direction.
 INITIAL_SPIN = 5.0
 
-# Tiny initial rocking-rate seed about world-x (roll), in rad/s.
+# Small initial rocking-rate seed about world-x (roll), in rad/s.
 # A perfectly upright pure vertical spin is an *exact* equilibrium: the
 # off-diagonal inertia term I_xy couples roll<->pitch, but it does not couple a
 # pure omega_z spin into anything, and with the CoM directly above the contact
 # point gravity exerts no torque.  So without a perturbation the stone spins
 # forever and the rattleback instability never gets excited.  A real rattleback
 # is never placed perfectly level; this seed plays that role and lets the
-# instability grow into rocking and spin reversal.  Set to 0.0 to reproduce the
-# degenerate pure-spin case.
-SEED_ROCK = 0.1
+# instability grow into rocking and spin reversal.  
+SEED_ROCK = 2.0
 
 
 # ── simulation ──────────────────────────────────────────────────────────────

@@ -5,32 +5,27 @@
           cone="elliptic"/>
 
   <visual>
-    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
-    <rgba haze="0.15 0.25 0.35 1"/>
     <global offwidth="1280" offheight="720"/>
   </visual>
 
   <asset>
-    <texture type="skybox" builtin="gradient"
-             rgb1="0.40 0.60 0.80" rgb2="0.04 0.04 0.10"
-             width="512" height="512"/>
-    <texture name="floor_tex" type="2d" builtin="checker"
-             rgb1="0.22 0.22 0.22" rgb2="0.30 0.30 0.30"
-             width="512" height="512"/>
-    <material name="floor_mat" texture="floor_tex" texrepeat="6 6"
-              reflectance="0.10"/>
+    
+    <texture name="floor_tex" type="2d" file="../images/dc-engineer-logo-transparent.png"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="1 1"
+              texuniform="false" reflectance="0.10"/>
     <material name="stone_mat" rgba="0.55 0.45 0.35 1"
               reflectance="0.25" specular="0.5" shininess="0.5"/>
+    <material name="x_mat" rgba="0.9 0.1 0.1 1" reflectance="0.25" specular="0.5" shininess="0.5"/>
+    <material name="y_mat" rgba="0.1 0.9 0.1 1" reflectance="0.25" specular="0.5" shininess="0.5"/>
+    <material name="z_mat" rgba="0.1 0.1 0.9 1" reflectance="0.25" specular="0.5" shininess="0.5"/>
   </asset>
 
   <worldbody>
     <light name="sun"  directional="true" pos="1 -1 4"
            dir="-0.3 0.3 -1"  diffuse="0.85 0.85 0.80" specular="0.05 0.05 0.05"/>
-    <light name="fill" directional="true" pos="-2 2 3"
-           dir="0.4 -0.4 -1"  diffuse="0.30 0.30 0.35" specular="0 0 0"/>
 
     <!-- Ground plane; friction = [sliding, torsional, rolling] -->
-    <geom name="floor" type="plane" size="2 2 0.1"
+    <geom name="floor" type="plane" size="0.628 0.628 0.1"
           material="floor_mat" friction="0.8 0.005 0.0001"/>
 
     <!-- Rattleback: free rigid body sitting on the ground -->
@@ -39,6 +34,15 @@
       <geom name="stone" type="ellipsoid" size="0.12 0.06 0.03"
             material="stone_mat" friction="0.8 0.005 0.0001"
             solref="0.008 1" solimp="0.9 0.95 0.001"/>
+      
+      <!-- visualization-only axes, to show the principal inertia directions -->
+      <geom name="x" type="cylinder" size="0.002 0.15" pos="0 0 0" euler="0 90 0"
+            material="x_mat" contype="0" conaffinity="0"/>
+      <geom name="y" type="cylinder" size="0.002 0.15" pos="0 0 0" euler="90 0 0"
+            material="y_mat" contype="0" conaffinity="0"/>
+      <geom name="z" type="cylinder" size="0.002 0.15" pos="0 0 0" euler="0 0 90"
+            material="z_mat" contype="0" conaffinity="0"/>
+
       <!--
         diaginertia order: I_xx, I_yy, I_zz in the principal frame.
         euler="0 0 20" tilts that principal frame 20° about body-z so the
