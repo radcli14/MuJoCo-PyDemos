@@ -1,24 +1,4 @@
 #!/usr/bin/env python3
-"""
-Rattleback (Celtic Stone) simulation — MuJoCo + Python.
-
-The rattleback is an ellipsoidal body whose inertia principal axes are
-tilted 20° relative to its geometric symmetry axes.  When spun in the
-"wrong" direction that tilt creates a gyroscopic coupling between the
-spin mode and the rocking (pitching / rolling) modes; the stone rocks,
-slows, and spontaneously reverses its spin direction.
-
-Outputs (written to the same directory as this script):
-  rattleback_sim.mp4   — rendered 3-D simulation video
-  rattleback_states.png — time-series and phase-portrait plots
-
-Usage:
-  python rattleback_sim.py
-
-Override the OpenGL backend if EGL is unavailable:
-  MUJOCO_GL=osmesa python rattleback_sim.py
-"""
-
 import os
 # EGL is the default headless backend; set before importing mujoco.
 os.environ.setdefault("MUJOCO_GL", "egl")
@@ -48,6 +28,17 @@ RENDER_H     = 720     # video height (px)
 # direction triggers spin reversal; negate if you want the stable direction.
 INITIAL_SPIN = 5.0
 
+# Tiny initial rocking-rate seed about world-x (roll), in rad/s.
+# A perfectly upright pure vertical spin is an *exact* equilibrium: the
+# off-diagonal inertia term I_xy couples roll<->pitch, but it does not couple a
+# pure omega_z spin into anything, and with the CoM directly above the contact
+# point gravity exerts no torque.  So without a perturbation the stone spins
+# forever and the rattleback instability never gets excited.  A real rattleback
+# is never placed perfectly level; this seed plays that role and lets the
+# instability grow into rocking and spin reversal.  Set to 0.0 to reproduce the
+# degenerate pure-spin case.
+SEED_ROCK = 0.1
+
 
 # ── simulation ──────────────────────────────────────────────────────────────
 def run_simulation():
@@ -57,18 +48,21 @@ def run_simulation():
 
     # Freejoint qvel: [vx, vy, vz, wx, wy, wz] — all in the world frame.
     data.qvel[5] = INITIAL_SPIN
+    data.qvel[3] = SEED_ROCK     # small roll-rate seed to break the upright-spin equilibrium
 
     # Resolve contacts and compute all derived quantities before the loop.
     mujoco.mj_forward(model, data)
 
     renderer = mujoco.Renderer(model, height=RENDER_H, width=RENDER_W)
 
-    # Tracking camera orbiting around the rattleback body.
+    # Stationary free camera aimed at the stone's resting position.  A tracking
+    # camera would follow the body as it rocks and drifts, making the view shake;
+    # a fixed lookat point keeps the camera perfectly still.
     cam = mujoco.MjvCamera()
     mujoco.mjv_defaultCamera(cam)
-    cam.type        = mujoco.mjtCamera.mjCAMERA_TRACKING
-    cam.trackbodyid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "rattleback")
-    cam.distance    = 0.55   # metres from tracked body
+    cam.type        = mujoco.mjtCamera.mjCAMERA_FREE
+    cam.lookat[:]   = (0.0, 0.0, 0.03)  # stone's initial position (world frame)
+    cam.distance    = 0.55   # metres from lookat point
     cam.azimuth     = 135.0  # degrees CCW from -y axis
     cam.elevation   = -25.0  # degrees below horizontal
 
