@@ -1,0 +1,72 @@
+<mujoco model="rattleback">
+  <!--
+    Rattleback (Celtic Stone) MJCF model.
+
+    Geometry  : solid ellipsoid, semi-axes a=0.12 m (long), b=0.06 m (wide),
+                c=0.03 m (tall).  Resting contact point is the bottom of the
+                ellipsoid; body origin placed at z = c so the stone just
+                touches the ground plane at t = 0.
+
+    Asymmetry : the inertia principal frame is rotated 20° about the body
+                z-axis relative to the geometric symmetry axes.  This creates
+                off-diagonal inertia coupling  I_xy = (I2-I1)/2 · sin(2·20°)
+                which drives gyroscopic spin reversal (the Celtic-stone effect).
+
+    Inertia   : diagonal values for a uniform solid ellipsoid
+                  I_a = m(b²+c²)/5 = 0.5·(0.0036+0.0009)/5 = 4.50e-4 kg·m²
+                  I_b = m(a²+c²)/5 = 0.5·(0.0144+0.0009)/5 = 1.53e-3 kg·m²
+                  I_c = m(a²+b²)/5 = 0.5·(0.0144+0.0036)/5 = 1.80e-3 kg·m²
+  -->
+
+  <!-- 0.5 ms timestep + RK4 gives accurate rigid-body / contact dynamics -->
+  <option timestep="0.0005" integrator="RK4" gravity="0 0 -9.81"
+          cone="elliptic"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global offwidth="1280" offheight="720"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient"
+             rgb1="0.40 0.60 0.80" rgb2="0.04 0.04 0.10"
+             width="512" height="512"/>
+    <texture name="floor_tex" type="2d" builtin="checker"
+             rgb1="0.22 0.22 0.22" rgb2="0.30 0.30 0.30"
+             width="512" height="512"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="6 6"
+              reflectance="0.10"/>
+    <material name="stone_mat" rgba="0.55 0.45 0.35 1"
+              reflectance="0.25" specular="0.5" shininess="0.5"/>
+  </asset>
+
+  <worldbody>
+    <light name="sun"  directional="true" pos="1 -1 4"
+           dir="-0.3 0.3 -1"  diffuse="0.85 0.85 0.80" specular="0.05 0.05 0.05"/>
+    <light name="fill" directional="true" pos="-2 2 3"
+           dir="0.4 -0.4 -1"  diffuse="0.30 0.30 0.35" specular="0 0 0"/>
+
+    <!-- Ground plane; friction = [sliding, torsional, rolling] -->
+    <geom name="floor" type="plane" size="2 2 0.1"
+          material="floor_mat" friction="0.8 0.005 0.0001"/>
+
+    <!-- Rattleback: free rigid body sitting on the ground -->
+    <body name="rattleback" pos="0 0 0.03">
+      <freejoint name="root"/>
+      <geom name="stone" type="ellipsoid" size="0.12 0.06 0.03"
+            material="stone_mat" friction="0.8 0.005 0.0001"
+            solref="0.008 1" solimp="0.9 0.95 0.001"/>
+      <!--
+        diaginertia order: I_xx, I_yy, I_zz in the principal frame.
+        euler="0 0 20" tilts that principal frame 20° about body-z so the
+        long-axis inertia principal axis is no longer aligned with the
+        geometric long axis — this is the source of the rattleback effect.
+      -->
+      <inertial pos="0 0 0" mass="0.5"
+                diaginertia="4.5e-4 1.53e-3 1.8e-3"
+                euler="0 0 20"/>
+    </body>
+  </worldbody>
+
+</mujoco>

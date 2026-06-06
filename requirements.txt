@@ -1,0 +1,16 @@
+# MuJoCo-PyDemos — Python dependencies
+#
+# Create and activate a virtual environment, then install:
+#   python -m venv .venv
+#   source .venv/bin/activate          # Linux / macOS
+#   .venv\Scripts\activate             # Windows
+#   pip install -r requirements.txt
+#
+# Headless rendering (Linux servers / CI):
+#   EGL  (GPU or CPU via libEGL): set MUJOCO_GL=egl   (default in rattleback_sim.py)
+#   Mesa (CPU software renderer): set MUJOCO_GL=osmesa and install libosmesa6
+
+mujoco>=3.1.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+imageio[ffmpeg]>=2.33.0
