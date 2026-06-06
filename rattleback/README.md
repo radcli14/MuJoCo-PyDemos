@@ -25,26 +25,30 @@ Resting contact point is the bottom of the ellipsoid; body origin placed at z = 
 ### Inertia
 Diagonal values for a uniform solid ellipsoid
 
-```math
-I_x = m(b²+c²)/5 = 0.5·(0.0036+0.0009)/5 = 4.50e^{-4} kg·m²
-```
-```math
-I_y = m(a²+c²)/5 = 0.5·(0.0144+0.0009)/5 = 1.53e^{-3} kg·m²
-```
-```math
-I_z = m(a²+b²)/5 = 0.5·(0.0144+0.0036)/5 = 1.80e^{-3} kg·m²
-```
+$$
+I_x = m(b^2+c^2)/5 = 0.5 \cdot (0.0036+0.0009)/5 = 4.50 \times 10^{-4}~\text{kg·m}^2
+$$
+
+$$
+I_y = m(a^2+c^2)/5 = 0.5 \cdot (0.0144+0.0009)/5 = 1.53 \times 10^{-3}~\text{kg·m}^2
+$$
+
+$$
+I_z = m(a^2+b^2)/5 = 0.5 \cdot (0.0144+0.0036)/5 = 1.80 \times 10^{-3}~\text{kg·m}^2
+$$
 
 ### Asymmetry
 The inertia principal frame is rotated 20° about the body z-axis relative to the geometric symmetry axes.  
 This creates off-diagonal inertia coupling 
-```math
-I_{xy} = \frac{I_y-I_x}{2} · sin(2·20°)
-```
+$$
+I_{xy} = \frac{I_y-I_x}{2} \cdot \sin(2 \cdot 20°)
+$$
 which drives gyroscopic spin reversal (the Celtic-stone effect).
 
 ## Results
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/TjvpU8pFmmM?si=cYdFd2da3UmajmXO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Rattleback simulation video](https://img.youtube.com/vi/TjvpU8pFmmM/maxresdefault.jpg)](https://www.youtube.com/watch?v=TjvpU8pFmmM)
+
+*(click the thumbnail to watch the simulation on YouTube)*
 
 ![Rattleback Simulation State Plots](rattleback_states.png)

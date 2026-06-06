@@ -1,0 +1,12 @@
+title: MuJoCo-PyDemos
+description: Demonstrations of the MuJoCo physics engine using Python.
+theme: jekyll-theme-cayman
+
+# README.md in each directory is served as that directory's index page.
+# Keep Python sources, the virtualenv, and large media out of the built site.
+exclude:
+  - .venv/
+  - "**/*.py"
+  - "**/*.mp4"
+  - requirements.txt
+  - SETUP.md
