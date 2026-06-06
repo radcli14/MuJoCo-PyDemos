@@ -26,20 +26,20 @@ Resting contact point is the bottom of the ellipsoid; body origin placed at z = 
 Diagonal values for a uniform solid ellipsoid
 
 ```math
-I_a = m(b²+c²)/5 = 0.5·(0.0036+0.0009)/5 = 4.50e-4 kg·m²
+I_x = m(b²+c²)/5 = 0.5·(0.0036+0.0009)/5 = 4.50e^{-4} kg·m²
 ```
 ```math
-I_b = m(a²+c²)/5 = 0.5·(0.0144+0.0009)/5 = 1.53e-3 kg·m²
+I_y = m(a²+c²)/5 = 0.5·(0.0144+0.0009)/5 = 1.53e^{-3} kg·m²
 ```
 ```math
-I_c = m(a²+b²)/5 = 0.5·(0.0144+0.0036)/5 = 1.80e-3 kg·m²
+I_z = m(a²+b²)/5 = 0.5·(0.0144+0.0036)/5 = 1.80e^{-3} kg·m²
 ```
 
 ### Asymmetry
 The inertia principal frame is rotated 20° about the body z-axis relative to the geometric symmetry axes.  
 This creates off-diagonal inertia coupling 
 ```math
-I_xy = (I2-I1)/2 · sin(2·20°)
+I_{xy} = \frac{I_y-I_x}{2} · sin(2·20°)
 ```
 which drives gyroscopic spin reversal (the Celtic-stone effect).
 
