@@ -43,3 +43,8 @@ I_{xy} = \frac{I_y-I_x}{2} · sin(2·20°)
 ```
 which drives gyroscopic spin reversal (the Celtic-stone effect).
 
+## Results
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/TjvpU8pFmmM?si=cYdFd2da3UmajmXO" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+![Rattleback Simulation State Plots](rattleback_states.png)
