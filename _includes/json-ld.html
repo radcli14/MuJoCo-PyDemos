@@ -1,0 +1,21 @@
+{% comment %}
+  VideoObject schema for any page with a youtube front-matter variable.
+  jekyll-seo-tag already emits WebSite / WebPage schemas; this adds the video.
+{% endcomment %}
+{% if page.youtube %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "{{ page.title | escape }} — MuJoCo Simulation",
+  "description": "{{ page.description | strip_newlines | escape }}",
+  "thumbnailUrl": "https://img.youtube.com/vi/{{ page.youtube }}/maxresdefault.jpg",
+  "embedUrl": "https://www.youtube.com/embed/{{ page.youtube }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "DC Engineer",
+    "url": "https://armor.dc-engineer.com"
+  }
+}
+</script>
+{% endif %}

@@ -1,0 +1,30 @@
+<article class="demo-card h-100">
+  <a href="{{ demo.url | relative_url }}" tabindex="-1" aria-hidden="true">
+    {% if demo.youtube %}
+    <img src="https://img.youtube.com/vi/{{ demo.youtube }}/mqdefault.jpg"
+         alt="{{ demo.title }} preview"
+         class="demo-card-thumb"
+         loading="lazy">
+    {% elsif demo.thumbnail %}
+    <img src="{{ demo.thumbnail | relative_url }}"
+         alt="{{ demo.title }} preview"
+         class="demo-card-thumb"
+         loading="lazy">
+    {% endif %}
+  </a>
+
+  <div class="demo-card-body">
+    <h3 class="demo-card-title">{{ demo.title }}</h3>
+    <p class="demo-card-desc">{{ demo.description }}</p>
+
+    {% if demo.tags %}
+    <div class="mb-3">
+      {% for tag in demo.tags %}
+      <span class="demo-tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <a href="{{ demo.url | relative_url }}" class="btn-demo-link">View Demo →</a>
+  </div>
+</article>

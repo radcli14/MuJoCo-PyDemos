@@ -1,0 +1,11 @@
+- id: rattleback
+  title: "Rattleback (Celtic Stone)"
+  description: >-
+    An ellipsoidal stone whose inertia principal axes are tilted 20° relative
+    to its geometric axes — spontaneous spin reversal through gyroscopic coupling.
+  url: /rattleback/
+  youtube: TjvpU8pFmmM
+  tags:
+    - rigid body
+    - angular momentum
+    - gyroscopic coupling

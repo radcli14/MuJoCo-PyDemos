@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-md navbar-dc sticky-top" x-data="{ open: false }">
+  <div class="container-xl">
+
+    <a class="navbar-brand-dc" href="{{ '/' | relative_url }}">
+      MuJoCo&nbsp;<span class="accent">PyDemos</span>
+    </a>
+
+    <button class="navbar-toggler navbar-dc" type="button"
+            @click="open = !open"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="navbar-collapse collapse" :class="{ 'show': open }">
+      <ul class="navbar-nav ms-auto align-items-md-center gap-md-1 pb-3 pb-md-0">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ '/' | relative_url }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ '/#demos' | relative_url }}">Demos</a>
+        </li>
+        <li class="nav-item ms-md-3 mt-2 mt-md-0">
+          <a href="https://armor.dc-engineer.com"
+             target="_blank" rel="noopener noreferrer"
+             class="btn-armor-nav">
+            ⬡&nbsp;ARMOR App
+          </a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</nav>
