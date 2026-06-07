@@ -19,6 +19,10 @@ specs:
   - { label: "Inertia tilt",  value: "α = 20° about vertical" }
   - { label: "Initial spin",  value: "ωz = 5 rad/s (CCW)" }
   - { label: "Seed rock",     value: "ωx = 2 rad/s" }
+source_dir: rattleback
+files:
+  - { label: "MJCF Model",    name: "rattleback.xml" }
+  - { label: "Python Script", name: "rattleback_sim.py" }
 ---
 
 The rattleback (also called a Celtic stone or *celt*) spontaneously reverses
@@ -92,4 +96,4 @@ Outputs written to the same directory:
 | `rattleback_sim.mp4` | Rendered 3-D video (1280 × 720, 60 fps) |
 | `rattleback_states.png` | Six-panel state plots |
 
-See [SETUP.md]({{ '/' | relative_url }}SETUP) for environment setup instructions.
+See [Setup & Installation](/setup/) for environment and dependency instructions.

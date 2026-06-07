@@ -9,6 +9,10 @@ baseurl: ""
 author:
   name: DC Engineer
 
+# Used in layouts to build GitHub source-file links
+github_repo:   "https://github.com/radcli14/MuJoCo-PyDemos"
+github_branch: "main"
+
 # GitHub Pages supported plugins
 plugins:
   - jekyll-sitemap
@@ -32,6 +36,5 @@ exclude:
   - "**/*.py"
   - "**/*.mp4"
   - requirements.txt
-  - SETUP.md
   - Gemfile
   - Gemfile.lock
