@@ -430,6 +430,18 @@ body {
   color: var(--dc-accent);
 }
 
+a.inline-code-link {
+  text-decoration: none;
+}
+a.inline-code-link code {
+  border-color: var(--dc-accent);
+  transition: background 0.15s, border-color 0.15s;
+}
+a.inline-code-link:hover code {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: var(--dc-accent);
+}
+
 .demo-content pre {
   background: #080f1e;
   border: 1px solid var(--dc-border);
