@@ -1,0 +1,97 @@
+---
+layout: default
+---
+
+<div class="container-xl demo-page">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-dc" aria-label="breadcrumb">
+    <a href="{{ '/' | relative_url }}">Home</a>
+    <span class="sep">›</span>
+    <span>{{ page.title }}</span>
+  </nav>
+
+  <!-- Page header -->
+  <header class="mb-4">
+    <h1 class="demo-page-title">{{ page.title }}</h1>
+    {% if page.subtitle %}
+    <p class="demo-page-subtitle">{{ page.subtitle }}</p>
+    {% endif %}
+    {% if page.tags %}
+    <div class="mt-2">
+      {% for tag in page.tags %}
+      <span class="demo-tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="row g-4 g-xl-5">
+
+    <!-- ── Main content column ─────────────────────────────── -->
+    <div class="col-lg-8">
+
+      {% if page.youtube %}
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube-nocookie.com/embed/{{ page.youtube }}"
+                title="{{ page.title | escape }} simulation video"
+                frameborder="0"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+      </div>
+      {% endif %}
+
+      <div class="demo-content">
+        {{ content }}
+      </div>
+
+    </div>
+
+    <!-- ── Sidebar ─────────────────────────────────────────── -->
+    <div class="col-lg-4">
+
+      {% if page.plot_image %}
+      <figure class="mb-3">
+        <img src="{{ page.plot_image | relative_url }}"
+             alt="{{ page.title }} state plots"
+             class="plot-img"
+             loading="lazy">
+        <figcaption class="mt-2 small" style="color:var(--dc-muted);">
+          State variable plots
+        </figcaption>
+      </figure>
+      {% endif %}
+
+      <!-- Simulation specs -->
+      {% if page.specs %}
+      <div class="sidebar-card">
+        <p class="sidebar-card-label">Simulation Specs</p>
+        {% for spec in page.specs %}
+        <div class="spec-row">
+          <span class="spec-label">{{ spec.label }}</span>
+          <span class="spec-value">{{ spec.value }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- ARMOR CTA -->
+      <div class="sidebar-card text-center">
+        <p class="sidebar-card-label">Try it on your device</p>
+        <p class="small mb-3" style="color:var(--dc-muted);line-height:1.55;">
+          Simulate this model interactively with the
+          <strong style="color:var(--dc-text);">ARMOR</strong> app —
+          MuJoCo physics on iPhone, iPad &amp; Mac.
+        </p>
+        <a href="https://armor.dc-engineer.com"
+           target="_blank" rel="noopener noreferrer"
+           class="btn-armor-nav">
+          ⬡ Get ARMOR →
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>

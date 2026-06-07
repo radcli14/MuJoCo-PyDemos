@@ -1,12 +1,32 @@
-title: MuJoCo-PyDemos
-description: Demonstrations of the MuJoCo physics engine using Python.
-theme: jekyll-theme-cayman
+title: MuJoCo PyDemos
+description: >-
+  Open-source Python simulations of the MuJoCo physics engine — rigid-body
+  dynamics, contacts, and constrained motion, with rendered video and state
+  plots for each demo.
+url: "https://mujoco.dc-engineer.com"
+baseurl: ""
 
-# README.md in each directory is served as that directory's index page.
-# Keep Python sources, the virtualenv, and large media out of the built site.
+author:
+  name: DC Engineer
+
+# GitHub Pages supported plugins
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Social links (used by jekyll-seo-tag for JSON-LD)
+social:
+  name: DC Engineer
+  links:
+    - https://github.com/radcli14
+    - https://armor.dc-engineer.com
+
+# Exclude from Jekyll build
 exclude:
   - .venv/
   - "**/*.py"
   - "**/*.mp4"
   - requirements.txt
   - SETUP.md
+  - Gemfile
+  - Gemfile.lock

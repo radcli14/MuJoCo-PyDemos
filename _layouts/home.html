@@ -1,0 +1,72 @@
+---
+layout: default
+---
+
+<!-- ── Hero ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container-xl position-relative">
+    <p class="hero-eyebrow">DC Engineer · MuJoCo Physics</p>
+    <h1 class="hero-title">
+      MuJoCo <span class="accent">PyDemos</span>
+    </h1>
+    <p class="hero-subtitle">
+      Open-source Python simulations of the MuJoCo physics engine —
+      rigid-body dynamics, contacts, and constrained motion,
+      with rendered video and state plots for each demo.
+    </p>
+    <div class="d-flex flex-wrap gap-3 justify-content-center">
+      <a href="#demos" class="btn-primary-dc">Browse Demos ↓</a>
+      <a href="https://armor.dc-engineer.com"
+         target="_blank" rel="noopener noreferrer"
+         class="btn-armor-hero">⬡ Get ARMOR App</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Demo gallery ──────────────────────────────────────── -->
+<section id="demos">
+  <div class="container-xl">
+    <p class="section-eyebrow">Simulations</p>
+    <h2 class="section-title">Available Demos</h2>
+    <p class="mb-4" style="color:var(--dc-muted);max-width:520px;">
+      Each demo includes an MJCF model, Python simulation script,
+      rendered video, and state-variable plots. Source code on
+      <a href="https://github.com/radcli14/MuJoCo-PyDemos"
+         target="_blank" rel="noopener noreferrer">GitHub</a>.
+    </p>
+
+    <div class="row g-4">
+      {% for demo in site.data.demos %}
+      <div class="col-sm-6 col-lg-4">
+        {% include demo-card.html demo=demo %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── ARMOR cross-promo ─────────────────────────────────── -->
+<div class="container-xl">
+  <div class="armor-banner">
+    <div class="position-relative">
+      <p class="section-eyebrow">Powered by the same engine</p>
+      <h2 class="armor-banner-title">
+        Simulate robots in augmented reality
+      </h2>
+      <p class="armor-banner-body">
+        <strong style="color:var(--dc-text);">ARMOR</strong>
+        (Augmented Reality Mobile Robotics) brings a full MuJoCo physics
+        engine to iPhone, iPad, and Mac — load and edit URDF models,
+        run real-time simulations, and visualize them in AR.
+        No ROS. No desktop app. No setup.
+      </p>
+      <a href="https://armor.dc-engineer.com"
+         target="_blank" rel="noopener noreferrer"
+         class="btn-armor-banner">
+        Visit armor.dc-engineer.com →
+      </a>
+    </div>
+  </div>
+</div>
+
+{{ content }}
