@@ -126,3 +126,38 @@ layout: default
 
   </div>
 </div>
+
+{% if page.files %}
+{% assign repo   = site.github_repo %}
+{% assign branch = site.github_branch | default: "main" %}
+{% assign dir    = page.source_dir %}
+<script>
+(function () {
+  var files = [
+    {% for file in page.files %}
+    {
+      name: {{ file.name | jsonify }},
+      blob: {{ repo | append: "/blob/" | append: branch | append: "/" | append: dir | append: "/" | append: file.name | jsonify }},
+      raw:  {{ repo | append: "/raw/"  | append: branch | append: "/" | append: dir | append: "/" | append: file.name | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ];
+
+  var fileMap = {};
+  files.forEach(function (f) { fileMap[f.name] = f; });
+
+  document.querySelectorAll('.demo-content code').forEach(function (el) {
+    var text = el.textContent.trim();
+    if (fileMap[text] && !el.closest('a') && el.parentElement.tagName !== 'PRE') {
+      var a = document.createElement('a');
+      a.href = fileMap[text].blob;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'inline-code-link';
+      el.parentNode.insertBefore(a, el);
+      a.appendChild(el);
+    }
+  });
+})();
+</script>
+{% endif %}
