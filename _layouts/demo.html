@@ -76,6 +76,37 @@ layout: default
       </div>
       {% endif %}
 
+      <!-- Source files -->
+      {% if page.files %}
+      {% assign repo   = site.github_repo %}
+      {% assign branch = site.github_branch | default: "main" %}
+      {% assign dir    = page.source_dir %}
+      <div class="sidebar-card">
+        <p class="sidebar-card-label">Source Files</p>
+        {% for file in page.files %}
+        {% assign ext = file.name | split: "." | last %}
+        <div class="source-file-row">
+          <span class="file-ext-badge">{{ ext }}</span>
+          <a href="{{ repo }}/blob/{{ branch }}/{{ dir }}/{{ file.name }}"
+             target="_blank" rel="noopener noreferrer"
+             class="source-file-link" title="{{ file.label }}">{{ file.name }}</a>
+          <a href="{{ repo }}/raw/{{ branch }}/{{ dir }}/{{ file.name }}"
+             target="_blank" rel="noopener noreferrer"
+             class="source-raw-link" title="Download raw file">↓</a>
+        </div>
+        {% endfor %}
+        <div class="source-file-footer">
+          <a href="{{ '/setup/' | relative_url }}" class="source-resource-link">
+            Setup &amp; Installation
+          </a>
+          <a href="{{ repo }}" target="_blank" rel="noopener noreferrer"
+             class="source-resource-link">
+            GitHub repo ↗
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
       <!-- ARMOR CTA -->
       <div class="sidebar-card text-center">
         <p class="sidebar-card-label">Also by DC Engineer</p>

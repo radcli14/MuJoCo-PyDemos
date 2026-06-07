@@ -31,7 +31,7 @@ layout: default
     <p class="mb-4" style="color:var(--dc-muted);max-width:520px;">
       Each demo includes an MJCF model, Python simulation script,
       rendered video, and state-variable plots. Source code on
-      <a href="https://github.com/radcli14/MuJoCo-PyDemos"
+      <a href="{{ site.github_repo }}"
          target="_blank" rel="noopener noreferrer">GitHub</a>.
     </p>
 
@@ -44,6 +44,41 @@ layout: default
     </div>
   </div>
 </section>
+
+<!-- ── Resources row ────────────────────────────────────── -->
+<div class="container-xl pb-5">
+  <div class="row g-3">
+
+    <div class="col-md-4">
+      <a href="{{ '/setup/' | relative_url }}" class="resource-card">
+        <span class="resource-icon">⚙</span>
+        <span class="resource-title">Setup &amp; Installation</span>
+        <span class="resource-desc">Get the Python environment running on macOS or Linux</span>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="{{ site.github_repo }}"
+         target="_blank" rel="noopener noreferrer"
+         class="resource-card">
+        <span class="resource-icon">⭑</span>
+        <span class="resource-title">GitHub Repository</span>
+        <span class="resource-desc">Source code, issues, and contributions welcome</span>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="https://mujoco.org"
+         target="_blank" rel="noopener noreferrer"
+         class="resource-card">
+        <span class="resource-icon">⬡</span>
+        <span class="resource-title">MuJoCo Docs</span>
+        <span class="resource-desc">Official documentation from Google DeepMind</span>
+      </a>
+    </div>
+
+  </div>
+</div>
 
 <!-- ── ARMOR cross-promo ─────────────────────────────────── -->
 <div class="container-xl">

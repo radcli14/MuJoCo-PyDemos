@@ -510,6 +510,119 @@ body {
   font-weight: 600;
 }
 
+/* ── Source files sidebar card ─────────────────────────────── */
+.source-file-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.38rem 0;
+  border-bottom: 1px solid rgba(27, 46, 69, 0.55);
+}
+
+.source-file-row:last-of-type { border-bottom: none; }
+
+.file-ext-badge {
+  font-family: var(--dc-font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  color: var(--dc-accent);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  min-width: 2.4rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.source-file-link {
+  font-family: var(--dc-font-mono);
+  font-size: 0.8rem;
+  color: var(--dc-muted);
+  text-decoration: none;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.source-file-link:hover { color: var(--dc-accent); }
+
+.source-raw-link {
+  font-size: 0.78rem;
+  color: var(--dc-border);
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 0 0.2rem;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.source-raw-link:hover { color: var(--dc-accent); }
+
+.source-file-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--dc-border);
+}
+
+.source-resource-link {
+  font-size: 0.82rem;
+  color: var(--dc-muted);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  transition: color 0.15s;
+}
+
+.source-resource-link:hover { color: var(--dc-accent); }
+
+/* ── Resource cards (home page) ────────────────────────────── */
+.resource-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--dc-card);
+  border: 1px solid var(--dc-border);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  text-decoration: none !important;
+  transition: border-color 0.2s, transform 0.2s;
+  height: 100%;
+}
+
+.resource-card:hover {
+  border-color: rgba(74, 222, 128, 0.45);
+  transform: translateY(-2px);
+}
+
+.resource-icon {
+  font-size: 1.25rem;
+  margin-bottom: 0.1rem;
+  opacity: 0.7;
+}
+
+.resource-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--dc-text);
+}
+
+.resource-desc {
+  font-size: 0.8rem;
+  color: var(--dc-muted);
+  line-height: 1.45;
+}
+
+/* ── Standalone page layout ────────────────────────────────── */
+.page-content {
+  max-width: 760px;
+}
+
 /* ── Scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 7px; }
 ::-webkit-scrollbar-track { background: var(--dc-bg); }

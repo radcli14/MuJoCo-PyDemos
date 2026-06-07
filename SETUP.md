@@ -1,4 +1,9 @@
-# Setup
+---
+layout: page
+title: "Setup & Installation"
+description: "How to set up the Python environment and run MuJoCo PyDemos on macOS and Linux."
+permalink: /setup/
+---
 
 Setup instructions for running the MuJoCo-PyDemos on **macOS (Apple Silicon)**.
 
