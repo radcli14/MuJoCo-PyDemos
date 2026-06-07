@@ -1,5 +1,6 @@
 ---
 layout: demo
+permalink: /rattleback/
 title: "Rattleback (Celtic Stone)"
 subtitle: "Spontaneous spin reversal through inertia asymmetry"
 description: >-
