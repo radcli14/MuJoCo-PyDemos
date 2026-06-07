@@ -21,6 +21,11 @@ social:
     - https://github.com/radcli14
     - https://armor.dc-engineer.com
 
+# Tell Kramdown to emit \[...\] / \(...\) so MathJax 3 can find the math
+markdown: kramdown
+kramdown:
+  math_engine: mathjax
+
 # Exclude from Jekyll build
 exclude:
   - .venv/
