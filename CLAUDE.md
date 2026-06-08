@@ -9,7 +9,7 @@ The content is educational, but assume the audience is well-informed (college or
 Assuming you are creating a new model in the folder `newmodel`, there will be a `newmodel.xml` file and a `newmodel_sim.py` file in the same folder. 
 The Python code will generate a `newmodel_states.png` file with plots, and a `newmodel_sim.mp4` file with video animation.
 A `README.md` file inside the folder will explain the model, and will be rendered on the website.
-Optionally, there may be a `newmodel_equations.py` file in which equations of motion are derived symbolically using [SymPy Mechanics](https://docs.sympy.org/latest/explanation/modules/physics/mechanics/index.html).
+Optionally, there may be a `newmodel_equations.ipynb` file in which equations of motion are derived symbolically using [SymPy Mechanics](https://docs.sympy.org/latest/explanation/modules/physics/mechanics/index.html).
 
 ## XML Guidelines
 
@@ -46,7 +46,7 @@ The header of the `README.md` file will contain the following fields:
 | `files`       | Generally `- { label: "MJCF Model", name: "newmodel.xml"}` and `- { label: "Python Script", name: "newmodel_"}`, may also include other files |
 
 Content in the header will render either in a right-hand panel on desktop, or below the main readme content on mobile, where "main" content refers to any markdown-formatted text underneath the header.
-Use the main readme content to explain items in the XML or Python script that are non-obvious, or that are unique or novel to the example that is being modeled. 
+Use the main readme content to explain items in the XML or Python script that are non-obvious, or that are unique or novel to the example that is being modeled, with code snippets included if they add value. 
 Avoid adding much boilerplate or obvious material to the readme for an individual model, but if it is useful and can be applied to multiple models, consider adding it to the main readme at the top level, the setup file, or other common location.
 
 Include equations where necessary to explain a setup in either the XML or Python, such as how a mass or inertial value is calculated.
@@ -54,3 +54,8 @@ Don't include equations if we are not actually implementing them in our code fil
 
 Make sure to explain what is happening inside the videos, with an intuitive physical explanation; if equations are indded critical to articulating the physics, you can include them.
 Make sure to explain what is included in the plots, but don't be overly elaborate with your explanations unless there is some specific area you want to highlight, especially if it connects to something that is observable in videos.
+
+Any time edits are made in a model, either by Claude or by the human, make sure that the readme is consistent with properties defined in the XML or Python.
+
+Do not wrap sentences in the markdown readme with a carriage return to limit the number of characters on a line.
+Make each line in the markdown be one complete sentence, and allow the markdown renderer to handle line wrapping.

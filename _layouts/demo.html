@@ -32,7 +32,7 @@ layout: default
     <div class="col-lg-8">
 
       {% if page.youtube %}
-      <div class="video-wrapper">
+      <div class="video-wrapper{% if page.youtube_short %} video-wrapper-short{% endif %}">
         <iframe src="https://www.youtube-nocookie.com/embed/{{ page.youtube }}"
                 title="{{ page.title | escape }} simulation video"
                 frameborder="0"
@@ -53,10 +53,12 @@ layout: default
 
       {% if page.plot_image %}
       <figure class="mb-3">
-        <img src="{{ page.plot_image | relative_url }}"
-             alt="{{ page.title }} state plots"
-             class="plot-img"
-             loading="lazy">
+        <a href="{{ page.plot_image | relative_url }}" target="_blank" rel="noopener">
+          <img src="{{ page.plot_image | relative_url }}"
+               alt="{{ page.title }} state plots"
+               class="plot-img"
+               loading="lazy">
+        </a>
         <figcaption class="mt-2 small" style="color:var(--dc-muted);">
           State variable plots
         </figcaption>
@@ -116,7 +118,7 @@ layout: default
           for iPhone, iPad, and Mac.
         </p>
         <a href="https://armor.dc-engineer.com"
-           target="_blank" rel="noopener noreferrer"
+           target="_blank" rel="noopener"
            class="btn-armor-nav">
           ⬡ Learn more →
         </a>

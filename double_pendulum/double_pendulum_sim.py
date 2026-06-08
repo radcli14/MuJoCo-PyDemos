@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-double_pendulum_sim.py — MuJoCo double pendulum under lunar gravity
-
-Outputs (written to the same directory):
-  double_pendulum_sim.mp4     rendered video  (1280 × 720, 60 fps)
-  double_pendulum_states.png  six-panel state plots
-"""
-
 import sys
 from pathlib import Path
 
@@ -125,8 +117,6 @@ def plot_states(times, theta1, theta2, omega1, omega2, tip):
     ax.set_ylabel("degrees", color=MUTED, fontsize=9)
 
     # ── Panel 3: end-cap position trace, coloured by time ─────────────────
-    # The pendulum swings in the x-z plane (rotation about y), so the tip path
-    # is its horizontal x vs vertical (world z); world y is the ~constant depth.
     ax = axes[0, 2]
     style_ax(ax)
     sc = ax.scatter(tip[:, 0], tip[:, 2], c=times, cmap="plasma", s=1, alpha=0.6, rasterized=True)

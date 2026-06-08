@@ -82,6 +82,12 @@ the body frame, creating the $I_{xy}$ coupling without altering the ellipsoid
 shape. The axis cylinders attached to the body (red = $x$, green = $y$,
 blue = $z$) visualize the geometric frame rotating with the stone.
 
+## Initial Conditions
+
+A pure vertical spin ($\omega_z \ne 0$, all other rates zero) is an *exact* equilibrium: the $I_{xy}$ coupling drives spin into roll/pitch only when angular momentum already has a transverse component.
+A perfectly upright initial state would spin indefinitely without reversal.
+The small seed roll rate $\omega_x = 2\ \text{rad/s}$ (`SEED_ROCK` in the script) plays the role of the inevitable imperfection when placing a real stone on a surface, allowing the gyroscopic instability to grow.
+
 ## Running the Simulation
 
 ```bash

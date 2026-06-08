@@ -24,19 +24,10 @@ RENDER_FPS   = 60      # video frame rate
 RENDER_W     = 1280    # video width  (px)
 RENDER_H     = 720     # video height (px)
 
-# Initial angular velocity about the world-z (vertical) axis in rad/s.
-# Positive = CCW from above.  With the 20° inertia tilt in the XML this
-# direction triggers spin reversal; negate if you want the stable direction.
+# rad/s CCW about world-z; this direction (with the 20° inertia tilt) triggers reversal.
 INITIAL_SPIN = 5.0
 
-# Small initial rocking-rate seed about world-x (roll), in rad/s.
-# A perfectly upright pure vertical spin is an *exact* equilibrium: the
-# off-diagonal inertia term I_xy couples roll<->pitch, but it does not couple a
-# pure omega_z spin into anything, and with the CoM directly above the contact
-# point gravity exerts no torque.  So without a perturbation the stone spins
-# forever and the rattleback instability never gets excited.  A real rattleback
-# is never placed perfectly level; this seed plays that role and lets the
-# instability grow into rocking and spin reversal.  
+# Small roll-rate seed to break the upright-spin equilibrium (see README).
 SEED_ROCK = 2.0
 
 
@@ -55,9 +46,7 @@ def run_simulation():
 
     renderer = mujoco.Renderer(model, height=RENDER_H, width=RENDER_W)
 
-    # Stationary free camera aimed at the stone's resting position.  A tracking
-    # camera would follow the body as it rocks and drifts, making the view shake;
-    # a fixed lookat point keeps the camera perfectly still.
+    # Fixed lookat avoids camera shake as the stone rocks and drifts.
     cam = make_free_camera(lookat=(0.0, 0.0, 0.03), distance=0.55,
                            azimuth=135.0, elevation=-25.0)
 

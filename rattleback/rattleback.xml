@@ -43,12 +43,7 @@
       <geom name="z" type="cylinder" size="0.002 0.15" pos="0 0 0" euler="0 0 90"
             material="z_mat" contype="0" conaffinity="0"/>
 
-      <!--
-        diaginertia order: I_xx, I_yy, I_zz in the principal frame.
-        euler="0 0 20" tilts that principal frame 20° about body-z so the
-        long-axis inertia principal axis is no longer aligned with the
-        geometric long axis — this is the source of the rattleback effect.
-      -->
+      <!-- euler="0 0 20" tilts the principal-inertia frame 20° about body-z, introducing I_xy coupling -->
       <inertial pos="0 0 0" mass="0.5"
                 diaginertia="4.5e-4 1.53e-3 1.8e-3"
                 euler="0 0 20"/>
