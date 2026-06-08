@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-import os
 import sys
-# Choose the OpenGL backend before importing mujoco.  macOS has no EGL, so it
-# uses GLFW; Linux defaults to EGL for headless GPU/CPU offscreen rendering.
-# setdefault() means an explicit MUJOCO_GL in the environment still wins.
-os.environ.setdefault("MUJOCO_GL", "glfw" if sys.platform == "darwin" else "egl")
-
 from pathlib import Path
-import numpy as np
-import mujoco
-import imageio
-import matplotlib
-matplotlib.use("Agg")   # non-interactive, safe for headless environments
-import matplotlib.pyplot as plt
+
+# Make the repo-root common.py importable, then import it before mujoco
+# (it selects the OpenGL backend on import).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import common                                                       # noqa: E402
+from common import (Palette, style_ax, make_free_camera,            # noqa: E402
+                    save_video, steps_per_frame, plt)
+
+import numpy as np                                                  # noqa: E402
+import mujoco                                                       # noqa: E402
 
 # ── file paths ──────────────────────────────────────────────────────────────
 HERE       = Path(__file__).parent
@@ -60,17 +58,12 @@ def run_simulation():
     # Stationary free camera aimed at the stone's resting position.  A tracking
     # camera would follow the body as it rocks and drifts, making the view shake;
     # a fixed lookat point keeps the camera perfectly still.
-    cam = mujoco.MjvCamera()
-    mujoco.mjv_defaultCamera(cam)
-    cam.type        = mujoco.mjtCamera.mjCAMERA_FREE
-    cam.lookat[:]   = (0.0, 0.0, 0.03)  # stone's initial position (world frame)
-    cam.distance    = 0.55   # metres from lookat point
-    cam.azimuth     = 135.0  # degrees CCW from -y axis
-    cam.elevation   = -25.0  # degrees below horizontal
+    cam = make_free_camera(lookat=(0.0, 0.0, 0.03), distance=0.55,
+                           azimuth=135.0, elevation=-25.0)
 
     dt           = model.opt.timestep
     n_steps      = int(SIM_DURATION / dt)
-    render_every = max(1, round(1.0 / (RENDER_FPS * dt)))
+    render_every = steps_per_frame(RENDER_FPS, dt)
 
     # Pre-allocate state arrays for performance.
     times  = np.empty(n_steps)
@@ -99,22 +92,6 @@ def run_simulation():
     return times, pos, quat, angvel, frames
 
 
-# ── video export ─────────────────────────────────────────────────────────────
-def save_video(frames):
-    print(f"Saving video → {VIDEO_PATH}")
-    writer = imageio.get_writer(
-        str(VIDEO_PATH),
-        fps=RENDER_FPS,
-        format="ffmpeg",
-        quality=8,
-        macro_block_size=None,
-    )
-    for frame in frames:
-        writer.append_data(frame)
-    writer.close()
-    print(f"  {len(frames)} frames written.")
-
-
 # ── helpers ──────────────────────────────────────────────────────────────────
 def quat_to_euler_deg(q):
     """ZYX Euler angles in degrees from (N, 4) quaternion array [w, x, y, z]."""
@@ -131,6 +108,20 @@ def quat_to_euler_deg(q):
 def plot_states(times, pos, quat, angvel):
     print(f"Saving plots  → {PLOT_PATH}")
 
+    # Shared dark palette (see common.Palette)
+    BG, TEXT, MUTED = Palette.BG, Palette.TEXT, Palette.MUTED
+    RED, BLUE, GREEN = Palette.RED, Palette.BLUE, Palette.GREEN
+    ORANGE = "#f59e0b"
+
+    def label(ax, xlabel, ylabel, title):
+        ax.set_title(title, color=TEXT, fontsize=11)
+        ax.set_xlabel(xlabel, color=MUTED, fontsize=9)
+        ax.set_ylabel(ylabel, color=MUTED, fontsize=9)
+
+    def legend(ax):
+        ax.legend(fontsize=9, labelcolor=TEXT,
+                  facecolor=Palette.CARD, edgecolor=Palette.EDGE)
+
     roll, pitch, _ = quat_to_euler_deg(quat)
     spin = angvel[:, 2]
 
@@ -138,74 +129,73 @@ def plot_states(times, pos, quat, angvel):
     reversal_idxs = np.where(np.diff(np.sign(spin)))[0]
 
     fig, axes = plt.subplots(3, 2, figsize=(14, 11))
+    fig.patch.set_facecolor(BG)
     fig.suptitle(
         "Rattleback (Celtic Stone) — MuJoCo Simulation",
-        fontsize=14, fontweight="bold",
+        fontsize=14, fontweight="bold", color=TEXT,
     )
 
     # 1 ── all three angular velocity components
     ax = axes[0, 0]
-    ax.plot(times, angvel[:, 0], lw=1.0, label=r"$\omega_x$ roll rate")
-    ax.plot(times, angvel[:, 1], lw=1.0, label=r"$\omega_y$ pitch rate")
-    ax.plot(times, spin,         lw=1.8, color="tab:red",
-            label=r"$\omega_z$ spin")
-    ax.axhline(0, color="k", lw=0.5, ls="--")
-    ax.set(xlabel="Time (s)", ylabel="rad/s", title="Angular Velocities")
-    ax.legend(fontsize=9)
-    ax.grid(alpha=0.3)
+    style_ax(ax)
+    ax.plot(times, angvel[:, 0], lw=1.0, color=BLUE,  label=r"$\omega_x$ roll rate")
+    ax.plot(times, angvel[:, 1], lw=1.0, color=GREEN, label=r"$\omega_y$ pitch rate")
+    ax.plot(times, spin,         lw=1.8, color=RED,   label=r"$\omega_z$ spin")
+    ax.axhline(0, color=MUTED, lw=0.5, ls="--")
+    label(ax, "Time (s)", "rad/s", "Angular Velocities")
+    legend(ax)
 
     # 2 ── spin with reversal events highlighted
     ax = axes[0, 1]
-    ax.plot(times, spin, lw=2.0, color="tab:red")
+    style_ax(ax)
+    ax.plot(times, spin, lw=2.0, color=RED)
     ax.fill_between(times, spin, 0, where=(spin > 0),
-                    alpha=0.20, color="tab:blue",   label="CCW (+)")
+                    alpha=0.25, color=BLUE,   label="CCW (+)")
     ax.fill_between(times, spin, 0, where=(spin < 0),
-                    alpha=0.20, color="tab:orange", label="CW  (−)")
+                    alpha=0.25, color=ORANGE, label="CW  (−)")
     for idx in reversal_idxs:
-        ax.axvline(times[idx], color="limegreen", lw=1.4, ls=":", alpha=0.9)
-    ax.axhline(0, color="k", lw=0.7, ls="--")
-    ax.set(xlabel="Time (s)", ylabel=r"$\omega_z$ (rad/s)",
-           title="Spin about Vertical — Reversal Events  (green ┊)")
-    ax.legend(fontsize=9)
-    ax.grid(alpha=0.3)
+        ax.axvline(times[idx], color=GREEN, lw=1.4, ls=":", alpha=0.9)
+    ax.axhline(0, color=MUTED, lw=0.7, ls="--")
+    label(ax, "Time (s)", r"$\omega_z$ (rad/s)",
+          "Spin about Vertical — Reversal Events  (green ┊)")
+    legend(ax)
 
     # 3 ── CoM height (bouncing / rocking amplitude)
     ax = axes[1, 0]
-    ax.plot(times, pos[:, 2] * 1e3, color="tab:green", lw=1.4)
-    ax.set(xlabel="Time (s)", ylabel="Height (mm)",
-           title="Centre-of-Mass Height")
-    ax.grid(alpha=0.3)
+    style_ax(ax)
+    ax.plot(times, pos[:, 2] * 1e3, color=GREEN, lw=1.4)
+    label(ax, "Time (s)", "Height (mm)", "Centre-of-Mass Height")
 
     # 4 ── tilt angles
     ax = axes[1, 1]
-    ax.plot(times, roll,  lw=1.2, label="Roll")
-    ax.plot(times, pitch, lw=1.2, label="Pitch")
-    ax.set(xlabel="Time (s)", ylabel="Angle (°)",
-           title="Tilt Angles (Roll & Pitch)")
-    ax.legend(fontsize=9)
-    ax.grid(alpha=0.3)
+    style_ax(ax)
+    ax.plot(times, roll,  lw=1.2, color=RED,  label="Roll")
+    ax.plot(times, pitch, lw=1.2, color=BLUE, label="Pitch")
+    label(ax, "Time (s)", "Angle (°)", "Tilt Angles (Roll & Pitch)")
+    legend(ax)
 
     # 5 ── horizontal position drift
     ax = axes[2, 0]
-    ax.plot(times, pos[:, 0] * 1e2, lw=1.2, label="x")
-    ax.plot(times, pos[:, 1] * 1e2, lw=1.2, label="y")
-    ax.set(xlabel="Time (s)", ylabel="Position (cm)",
-           title="Horizontal Drift")
-    ax.legend(fontsize=9)
-    ax.grid(alpha=0.3)
+    style_ax(ax)
+    ax.plot(times, pos[:, 0] * 1e2, lw=1.2, color=BLUE,  label="x")
+    ax.plot(times, pos[:, 1] * 1e2, lw=1.2, color=GREEN, label="y")
+    label(ax, "Time (s)", "Position (cm)", "Horizontal Drift")
+    legend(ax)
 
     # 6 ── phase portrait: spin vs roll-rate, coloured by time
     ax = axes[2, 1]
+    style_ax(ax)
     sc = ax.scatter(spin, angvel[:, 0], c=times, cmap="plasma",
                     s=2, alpha=0.7, rasterized=True)
-    plt.colorbar(sc, ax=ax, label="Time (s)")
-    ax.set(xlabel=r"$\omega_z$ — Spin (rad/s)",
-           ylabel=r"$\omega_x$ — Roll rate (rad/s)",
-           title="Phase Portrait: Roll Rate vs Spin")
-    ax.grid(alpha=0.3)
+    cb = plt.colorbar(sc, ax=ax)
+    cb.set_label("Time (s)", color=MUTED, fontsize=9)
+    cb.ax.yaxis.set_tick_params(color=MUTED)
+    plt.setp(cb.ax.yaxis.get_ticklabels(), color=MUTED)
+    label(ax, r"$\omega_z$ — Spin (rad/s)", r"$\omega_x$ — Roll rate (rad/s)",
+          "Phase Portrait: Roll Rate vs Spin")
 
     plt.tight_layout()
-    fig.savefig(str(PLOT_PATH), dpi=150, bbox_inches="tight")
+    fig.savefig(str(PLOT_PATH), dpi=150, bbox_inches="tight", facecolor=BG)
     plt.close(fig)
     print("  Plots saved.")
 
@@ -221,5 +211,5 @@ def plot_states(times, pos, quat, angvel):
 # ── entry point ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     times, pos, quat, angvel, frames = run_simulation()
-    save_video(frames)
+    save_video(frames, VIDEO_PATH, RENDER_FPS)
     plot_states(times, pos, quat, angvel)

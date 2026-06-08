@@ -7,19 +7,18 @@ Outputs (written to the same directory):
   double_pendulum_states.png  six-panel state plots
 """
 
-import os
 import sys
-# Choose OpenGL backend before importing mujoco.
-# macOS has no EGL; Linux defaults to EGL for headless offscreen rendering.
-os.environ.setdefault("MUJOCO_GL", "glfw" if sys.platform == "darwin" else "egl")
-
 from pathlib import Path
-import numpy as np
-import mujoco
-import imageio
-import matplotlib
-matplotlib.use("Agg")   # non-interactive backend; safe for headless environments
-import matplotlib.pyplot as plt
+
+# Make the repo-root common.py importable, then import it before mujoco
+# (it selects the OpenGL backend on import).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import common                                                       # noqa: E402
+from common import (Palette, style_ax, make_free_camera,            # noqa: E402
+                    save_video, steps_per_frame, plt)
+
+import numpy as np                                                  # noqa: E402
+import mujoco                                                       # noqa: E402
 
 # ── file paths ───────────────────────────────────────────────────────────────
 HERE       = Path(__file__).parent
@@ -53,17 +52,12 @@ def run_simulation():
     end_cap_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "end_cap")
 
     # Isometric view
-    cam = mujoco.MjvCamera()
-    mujoco.mjv_defaultCamera(cam)
-    cam.type        = mujoco.mjtCamera.mjCAMERA_FREE
-    cam.lookat[:]   = (-0.025, 0.0, -0.1)
-    cam.distance    = 2.2
-    cam.azimuth     = 300.0
-    cam.elevation   = -35
+    cam = make_free_camera(lookat=(-0.025, 0.0, -0.1), distance=2.2,
+                           azimuth=300.0, elevation=-35)
 
     dt           = model.opt.timestep
     n_steps      = int(SIM_DURATION / dt)
-    render_every = max(1, round(1.0 / (RENDER_FPS * dt)))
+    render_every = steps_per_frame(RENDER_FPS, dt)
 
     times  = np.empty(n_steps)
     theta1 = np.empty(n_steps)
@@ -96,35 +90,13 @@ def run_simulation():
     return times, theta1, theta2, omega1, omega2, tip, frames
 
 
-# ── video export ──────────────────────────────────────────────────────────────
-def save_video(frames):
-    print(f"Saving video → {VIDEO_PATH}")
-    writer = imageio.get_writer(
-        str(VIDEO_PATH),
-        fps=RENDER_FPS,
-        format="ffmpeg",
-        quality=8,
-        macro_block_size=None,
-    )
-    for frame in frames:
-        writer.append_data(frame)
-    writer.close()
-    print(f"  {len(frames)} frames written.")
-
-
 # ── state plots ───────────────────────────────────────────────────────────────
 def plot_states(times, theta1, theta2, omega1, omega2, tip):
     print(f"Saving plots  → {PLOT_PATH}")
 
-    # Site palette
-    BG    = "#070c17"
-    CARD  = "#10192b"
-    EDGE  = "#1b2e45"
-    TEXT  = "#e6edf5"
-    MUTED = "#7a92ab"
-    RED   = "#ef4444"
-    BLUE  = "#3b82f6"
-    GREEN = "#4ade80"
+    # Shared dark palette (see common.Palette)
+    BG, TEXT, MUTED = Palette.BG, Palette.TEXT, Palette.MUTED
+    RED, BLUE = Palette.RED, Palette.BLUE
 
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     fig.patch.set_facecolor(BG)
@@ -132,13 +104,6 @@ def plot_states(times, theta1, theta2, omega1, omega2, tip):
         "Double Pendulum — MuJoCo Simulation (Moon Gravity, g = 1.62 m/s²)",
         fontsize=13, fontweight="bold", color=TEXT,
     )
-
-    def style_ax(ax):
-        ax.set_facecolor(CARD)
-        for spine in ax.spines.values():
-            spine.set_edgecolor(EDGE)
-        ax.tick_params(colors=MUTED)
-        ax.grid(alpha=0.15, color=EDGE)
 
     deg1 = np.degrees(theta1)
     deg2 = np.degrees(theta2)
@@ -211,5 +176,5 @@ def plot_states(times, theta1, theta2, omega1, omega2, tip):
 # ── entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     times, theta1, theta2, omega1, omega2, tip, frames = run_simulation()
-    save_video(frames)
+    save_video(frames, VIDEO_PATH, RENDER_FPS)
     plot_states(times, theta1, theta2, omega1, omega2, tip)
