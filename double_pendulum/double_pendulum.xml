@@ -4,7 +4,7 @@
 
   <visual>
     <headlight diffuse="0.55 0.55 0.55" ambient="0.30 0.30 0.30" specular="0.10 0.10 0.10"/>
-    <global offwidth="1280" offheight="720"/>
+    <global offwidth="1080" offheight="1920"/>
   </visual>
 
   <asset>
@@ -12,10 +12,7 @@
     <texture name="shield_tex" type="2d"
              file="../images/dc-engineer-logo-transparent.png"/>
 
-    <!-- Door surface: dark navy base shows through transparent logo pixels -->
-    <material name="door_bg_mat"   rgba="0.10 0.12 0.20 1"/>
     <material name="door_logo_mat" texture="shield_tex" texrepeat="1 1" rgba="1 1 1 1"/>
-    <material name="door_trim_mat" rgba="0.18 0.22 0.34 1"/>
 
     <!-- Red plexiglass (link 1) -->
     <material name="link1_mat" rgba="0.88 0.16 0.16 0.72"
@@ -32,70 +29,45 @@
 
   <worldbody>
 
-    <!-- ── Static door backdrop ────────────────────────────────────────── -->
-    <!--
-      Positioned at y = -0.09 (behind the pendulum which swings at y = 0).
-      Camera is at y ≈ +1.4 looking toward -y, so the door is the backdrop.
-    -->
-    <body name="door" pos="0 -0.09 -0.06">
-
-      <!-- Outer frame (slightly larger, darker) -->
-      <geom name="door_frame" type="box" size="0.44 0.004 0.42"
-            material="door_trim_mat" contype="0" conaffinity="0"/>
-
-      <!-- Inner panel: dark navy base, logo centred -->
-      <geom name="door_bg" type="box" size="0.40 0.006 0.38"
-            pos="0 0.005 0"
-            material="door_bg_mat" contype="0" conaffinity="0"/>
-
-      <!-- Logo surface: transparent PNG over the dark panel -->
-      <geom name="door_logo" type="box" size="0.28 0.007 0.28"
-            pos="0 0.010 0.02"
+    <!-- ── Static logo backdrop ────────────────────────────────────────── -->
+    <body name="backdrop" pos="0 0 0.157">
+      <geom name="door_logo" type="plane" size="0.628 0.628 0.1"
+            pos="0 0 0" euler="90 180 0"
             material="door_logo_mat" contype="0" conaffinity="0"/>
 
     </body>
 
     <!-- ── Pendulum ────────────────────────────────────────────────────── -->
-    <!--
-      Pivot at (0, 0, 0.25).  When both joints are at qpos = 0 the links
-      hang straight down; qpos = π means inverted (pointing up).
-    -->
-    <body name="pivot_mount" pos="0 0 0.25">
+    <body name="pivot_mount">
 
-      <!-- Top pivot pin (y-aligned cylinder, visual only) -->
-      <geom name="top_pin" type="cylinder" size="0.014 0.044"
-            euler="90 0 0" material="hinge_mat"
+      <!-- Top pivot pin -->
+      <geom name="top_pin" type="cylinder" size="0.009 0.0314"
+            pos="0 0.0157 0" euler="90 0 0" material="hinge_mat"
             density="0" contype="0" conaffinity="0"/>
 
       <!-- ── Link 1 (red plexiglass) ───────────────────────────────── -->
-      <body name="link1" pos="0 0 0">
-        <joint name="j1" type="hinge" axis="0 1 0" pos="0 0 0"/>
-
-        <!--
-          Bar half-extents: 22 × 11 × 125 mm.
-          Centred at -125 mm from the hinge so the bar spans 0 → -250 mm.
-          density = 1180 kg/m³ (acrylic / plexiglass).
-        -->
-        <geom name="bar1" type="box" size="0.022 0.011 0.125"
-              pos="0 0 -0.125" material="link1_mat"
+      <body name="link1" pos="0 0.025 0">
+        <joint name="j1" type="hinge" axis="0 1 0"/>
+        <geom name="bar1" type="box" size="0.022 0.011 0.15"
+              pos="0 0 0.125" material="link1_mat"
               density="1180" contype="0" conaffinity="0"/>
 
-        <!-- Mid hinge cylinder between link 1 and link 2 -->
-        <geom name="mid_pin" type="cylinder" size="0.014 0.044"
-              pos="0 0 -0.25" euler="90 0 0" material="hinge_mat"
+        <!-- Mid hinge cylinder -->
+        <geom name="mid_pin" type="cylinder" size="0.009 0.0314"
+              pos="0 0.0212 0.25" euler="90 0 0" material="hinge_mat"
               density="0" contype="0" conaffinity="0"/>
 
         <!-- ── Link 2 (blue plexiglass) ──────────────────────────── -->
-        <body name="link2" pos="0 0 -0.25">
-          <joint name="j2" type="hinge" axis="0 1 0" pos="0 0 0"/>
+        <body name="link2" pos="0 0.0305 0.25">
+          <joint name="j2" type="hinge" axis="0 1 0"/>
 
-          <geom name="bar2" type="box" size="0.022 0.011 0.125"
-                pos="0 0 -0.125" material="link2_mat"
+          <geom name="bar2" type="box" size="0.022 0.011 0.15"
+                pos="0 0 0.125" material="link2_mat"
                 density="1180" contype="0" conaffinity="0"/>
 
           <!-- End cap sphere at tip of link 2 -->
           <geom name="end_cap" type="sphere" size="0.018"
-                pos="0 0 -0.25" material="link2_mat"
+                pos="0 0 0.25" material="link2_mat"
                 density="0" contype="0" conaffinity="0"/>
 
         </body>
