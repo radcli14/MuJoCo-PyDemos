@@ -127,6 +127,33 @@ layout: default
     </div>
 
   </div>
+
+  <!-- ── Demo navigation ─────────────────────────────────────── -->
+  {% assign demos = site.data.demos %}
+  {% assign demos_size = demos | size %}
+  {% if demos_size > 1 %}
+  {% assign found_idx = 0 %}
+  {% for demo in demos %}
+    {% if demo.url == page.permalink %}{% assign found_idx = forloop.index0 %}{% endif %}
+  {% endfor %}
+  {% assign prev_idx = found_idx | minus: 1 %}
+  {% if prev_idx < 0 %}{% assign prev_idx = demos_size | minus: 1 %}{% endif %}
+  {% assign next_idx = found_idx | plus: 1 %}
+  {% if next_idx >= demos_size %}{% assign next_idx = 0 %}{% endif %}
+  {% assign prev_demo = demos[prev_idx] %}
+  {% assign next_demo = demos[next_idx] %}
+  <div class="demo-nav-row">
+    <a href="{{ prev_demo.url | relative_url }}" class="demo-nav-btn demo-nav-btn--prev">
+      <span class="demo-nav-label">← Previous</span>
+      <span class="demo-nav-title">{{ prev_demo.title }}</span>
+    </a>
+    <a href="{{ next_demo.url | relative_url }}" class="demo-nav-btn demo-nav-btn--next">
+      <span class="demo-nav-label">Next →</span>
+      <span class="demo-nav-title">{{ next_demo.title }}</span>
+    </a>
+  </div>
+  {% endif %}
+
 </div>
 
 {% if page.files %}

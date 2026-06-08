@@ -603,6 +603,52 @@ a.inline-code-link:hover code {
 
 .source-resource-link:hover { color: var(--dc-accent); }
 
+/* ── Demo prev/next navigation ─────────────────────────────── */
+.demo-nav-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 0 2rem;
+  border-top: 1px solid var(--dc-border);
+  margin-top: 2rem;
+}
+
+.demo-nav-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1.1rem;
+  background: var(--dc-surface);
+  border: 1px solid var(--dc-border);
+  border-radius: 8px;
+  text-decoration: none !important;
+  transition: border-color 0.15s, background 0.15s;
+  max-width: 48%;
+}
+
+.demo-nav-btn:hover {
+  border-color: var(--dc-accent);
+  background: var(--dc-card);
+}
+
+.demo-nav-label {
+  font-size: 0.75rem;
+  color: var(--dc-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.demo-nav-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dc-text);
+}
+
+.demo-nav-btn--next {
+  text-align: right;
+  margin-left: auto;
+}
+
 /* ── Resource cards (home page) ────────────────────────────── */
 .resource-card {
   display: flex;
