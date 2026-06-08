@@ -8,6 +8,7 @@ description: >-
   its geometric symmetry axes. Spin in the wrong direction creates gyroscopic
   coupling that rocks, slows, and reverses the stone.
 youtube: TjvpU8pFmmM
+date: 2026-06-06
 plot_image: /rattleback/rattleback_states.png
 image: "https://img.youtube.com/vi/TjvpU8pFmmM/maxresdefault.jpg"
 tags: [rigid body, angular momentum, gyroscopic coupling]

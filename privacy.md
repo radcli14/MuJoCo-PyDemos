@@ -3,6 +3,7 @@ layout: page
 title: "Privacy Policy"
 description: "How this site handles data — no analytics, no accounts, self-hosted fonts."
 permalink: /privacy/
+sitemap: false
 ---
 
 This site is a static website hosted on [GitHub Pages](https://pages.github.com).

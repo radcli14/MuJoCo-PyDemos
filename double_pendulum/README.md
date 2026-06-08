@@ -9,6 +9,7 @@ description: >-
   differences in initial angle grow exponentially — a hallmark of chaos.
 youtube: M5NC8nGev6o
 youtube_short: true
+date: 2026-06-08
 plot_image: /double_pendulum/double_pendulum_states.png
 image: /double_pendulum/double_pendulum_states.png
 tags: [chaos, rigid body, nonlinear dynamics]

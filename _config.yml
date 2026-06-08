@@ -9,6 +9,8 @@ baseurl: ""
 author:
   name: DC Engineer
 
+image: /images/dc-engineer-logo-transparent.png
+
 # Used in layouts to build GitHub source-file links
 github_repo:   "https://github.com/radcli14/MuJoCo-PyDemos"
 github_branch: "main"
@@ -22,8 +24,13 @@ plugins:
 social:
   name: DC Engineer
   links:
+    - https://dc-engineer.com
     - https://github.com/radcli14
+    - https://www.instagram.com/ar.mobile.robotics
     - https://armor.dc-engineer.com
+    - https://twolinks.dc-engineer.com
+    - https://youkon.dc-engineer.com
+    - https://www.youtube.com/@dc-engineer
 
 # Tell Kramdown to emit \[...\] / \(...\) so MathJax 3 can find the math
 markdown: kramdown

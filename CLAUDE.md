@@ -38,6 +38,7 @@ The header of the `README.md` file will contain the following fields:
 | `subtitle`    | Short explanation of the model, keep to one line    |
 | `description` | Longer explanation of the model, 2-4 sentences      |
 | `youtube`     | YouTube video ID, I will provide if I upload one    |
+| `date`        | Publish date in `YYYY-MM-DD` format; required when `youtube` is set (populates `uploadDate` in VideoObject schema) |
 | `plot_image`  | Generally the `newmodel/newmodel_states.png` file.  |
 | `image`       | Can be the plot image, or `maxresdefault.jpg` from YouTube, this renders on home page |
 | `tags`        | Generally use three tags, physics-related           |
