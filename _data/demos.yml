@@ -1,3 +1,17 @@
+- id: double_pendulum
+  title: "Double Pendulum"
+  description: >-
+    Two rigid plexiglass links joined by cylindrical hinges, swinging in a
+    vertical plane on the Moon. Starting near the inverted position, the
+    motion becomes chaotic within seconds — a classic demonstration of
+    sensitive dependence on initial conditions.
+  url: /double_pendulum/
+  thumbnail: /double_pendulum/double_pendulum_states.png
+  tags:
+    - chaos
+    - rigid body
+    - nonlinear dynamics
+
 - id: rattleback
   title: "Rattleback (Celtic Stone)"
   description: >-

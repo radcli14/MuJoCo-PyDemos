@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+"""
+double_pendulum_sim.py — MuJoCo double pendulum under lunar gravity
+
+Outputs (written to the same directory):
+  double_pendulum_sim.mp4     rendered video  (1280 × 720, 60 fps)
+  double_pendulum_states.png  six-panel state plots
+"""
+
+import os
+import sys
+# Choose OpenGL backend before importing mujoco.
+# macOS has no EGL; Linux defaults to EGL for headless offscreen rendering.
+os.environ.setdefault("MUJOCO_GL", "glfw" if sys.platform == "darwin" else "egl")
+
+from pathlib import Path
+import numpy as np
+import mujoco
+import imageio
+import matplotlib
+matplotlib.use("Agg")   # non-interactive backend; safe for headless environments
+import matplotlib.pyplot as plt
+
+# ── file paths ───────────────────────────────────────────────────────────────
+HERE       = Path(__file__).parent
+MODEL_PATH = HERE / "double_pendulum.xml"
+VIDEO_PATH = HERE / "double_pendulum_sim.mp4"
+PLOT_PATH  = HERE / "double_pendulum_states.png"
+
+# ── simulation knobs ─────────────────────────────────────────────────────────
+SIM_DURATION = 30.0     # seconds
+RENDER_FPS   = 60
+RENDER_W     = 1280
+RENDER_H     = 720
+
+# Initial joint angles in radians measured from the downward-hanging position.
+# qpos = π means the link points straight up (inverted, unstable equilibrium).
+# Starting both links nearly inverted with a tiny asymmetric offset triggers
+# the chaotic tumbling — the inverted double pendulum is maximally sensitive
+# to initial conditions; a change of 1e-6 rad gives a completely different
+# trajectory within seconds.
+THETA1_0 = np.pi - 0.05   # link 1: 2.9° from fully inverted
+THETA2_0 = 0.08            # link 2: 4.6° from link 1 (breaks symmetry)
+
+
+# ── simulation ───────────────────────────────────────────────────────────────
+def run_simulation():
+    model = mujoco.MjModel.from_xml_path(str(MODEL_PATH))
+    data  = mujoco.MjData(model)
+    mujoco.mj_resetData(model, data)
+
+    data.qpos[0] = THETA1_0
+    data.qpos[1] = THETA2_0
+    mujoco.mj_forward(model, data)
+
+    # Front view: camera on the +y side looking toward -y so the full
+    # x-z swing plane is visible with the door backdrop behind the links.
+    # azimuth=180 → camera at lookat + (0, +distance, 0).
+    cam = mujoco.MjvCamera()
+    mujoco.mjv_defaultCamera(cam)
+    cam.type        = mujoco.mjtCamera.mjCAMERA_FREE
+    cam.lookat[:]   = (0.0, 0.0, 0.0)
+    cam.distance    = 1.40
+    cam.azimuth     = 180.0
+    cam.elevation   = 0.0
+
+    dt           = model.opt.timestep
+    n_steps      = int(SIM_DURATION / dt)
+    render_every = max(1, round(1.0 / (RENDER_FPS * dt)))
+
+    times  = np.empty(n_steps)
+    theta1 = np.empty(n_steps)
+    theta2 = np.empty(n_steps)
+    omega1 = np.empty(n_steps)
+    omega2 = np.empty(n_steps)
+    frames = []
+
+    print(f"Simulating {SIM_DURATION} s  "
+          f"({n_steps:,} steps, Δt = {dt * 1e3:.1f} ms) …")
+
+    renderer = mujoco.Renderer(model, height=RENDER_H, width=RENDER_W)
+    for i in range(n_steps):
+        times[i]  = data.time
+        theta1[i] = data.qpos[0]
+        theta2[i] = data.qpos[1]
+        omega1[i] = data.qvel[0]
+        omega2[i] = data.qvel[1]
+
+        if i % render_every == 0:
+            renderer.update_scene(data, camera=cam)
+            frames.append(renderer.render().copy())
+
+        mujoco.mj_step(model, data)
+
+    renderer.close()
+    print(f"Captured {len(frames)} frames.")
+    return times, theta1, theta2, omega1, omega2, frames
+
+
+# ── video export ──────────────────────────────────────────────────────────────
+def save_video(frames):
+    print(f"Saving video → {VIDEO_PATH}")
+    writer = imageio.get_writer(
+        str(VIDEO_PATH),
+        fps=RENDER_FPS,
+        format="ffmpeg",
+        quality=8,
+        macro_block_size=None,
+    )
+    for frame in frames:
+        writer.append_data(frame)
+    writer.close()
+    print(f"  {len(frames)} frames written.")
+
+
+# ── state plots ───────────────────────────────────────────────────────────────
+def plot_states(times, theta1, theta2, omega1, omega2):
+    print(f"Saving plots  → {PLOT_PATH}")
+
+    # Site palette
+    BG    = "#070c17"
+    CARD  = "#10192b"
+    EDGE  = "#1b2e45"
+    TEXT  = "#e6edf5"
+    MUTED = "#7a92ab"
+    RED   = "#ef4444"
+    BLUE  = "#3b82f6"
+    GREEN = "#4ade80"
+
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+    fig.patch.set_facecolor(BG)
+    fig.suptitle(
+        "Double Pendulum — MuJoCo Simulation (Moon Gravity, g = 1.62 m/s²)",
+        fontsize=13, fontweight="bold", color=TEXT,
+    )
+
+    def style_ax(ax):
+        ax.set_facecolor(CARD)
+        for spine in ax.spines.values():
+            spine.set_edgecolor(EDGE)
+        ax.tick_params(colors=MUTED)
+        ax.grid(alpha=0.15, color=EDGE)
+
+    deg1 = np.degrees(theta1)
+    deg2 = np.degrees(theta2)
+
+    # ── Panel 1: θ₁ vs time ─────────────────────────────────────────────────
+    ax = axes[0, 0]
+    style_ax(ax)
+    ax.plot(times, deg1, color=RED, lw=1.1)
+    ax.set_title("θ₁ — Link 1 Angle", color=TEXT, fontsize=10)
+    ax.set_xlabel("time (s)", color=MUTED, fontsize=9)
+    ax.set_ylabel("degrees", color=MUTED, fontsize=9)
+
+    # ── Panel 2: θ₂ vs time ─────────────────────────────────────────────────
+    ax = axes[0, 1]
+    style_ax(ax)
+    ax.plot(times, deg2, color=BLUE, lw=1.1)
+    ax.set_title("θ₂ — Link 2 Angle", color=TEXT, fontsize=10)
+    ax.set_xlabel("time (s)", color=MUTED, fontsize=9)
+    ax.set_ylabel("degrees", color=MUTED, fontsize=9)
+
+    # ── Panel 3: phase portrait θ₁ vs θ₂, coloured by time ─────────────────
+    ax = axes[0, 2]
+    style_ax(ax)
+    sc = ax.scatter(deg1, deg2, c=times, cmap="plasma", s=1, alpha=0.6, rasterized=True)
+    cb = plt.colorbar(sc, ax=ax)
+    cb.set_label("Time (s)", color=MUTED, fontsize=9)
+    cb.ax.yaxis.set_tick_params(color=MUTED)
+    plt.setp(cb.ax.yaxis.get_ticklabels(), color=MUTED)
+    ax.set_title("Phase Portrait  θ₁ vs θ₂", color=TEXT, fontsize=10)
+    ax.set_xlabel("θ₁ (deg)", color=MUTED, fontsize=9)
+    ax.set_ylabel("θ₂ (deg)", color=MUTED, fontsize=9)
+
+    # ── Panel 4: ω₁ vs time ─────────────────────────────────────────────────
+    ax = axes[1, 0]
+    style_ax(ax)
+    ax.plot(times, omega1, color=RED, lw=1.1)
+    ax.set_title("ω₁ — Link 1 Angular Velocity", color=TEXT, fontsize=10)
+    ax.set_xlabel("time (s)", color=MUTED, fontsize=9)
+    ax.set_ylabel("rad/s", color=MUTED, fontsize=9)
+
+    # ── Panel 5: ω₂ vs time ─────────────────────────────────────────────────
+    ax = axes[1, 1]
+    style_ax(ax)
+    ax.plot(times, omega2, color=BLUE, lw=1.1)
+    ax.set_title("ω₂ — Link 2 Angular Velocity", color=TEXT, fontsize=10)
+    ax.set_xlabel("time (s)", color=MUTED, fontsize=9)
+    ax.set_ylabel("rad/s", color=MUTED, fontsize=9)
+
+    # ── Panel 6: angular velocity phase portrait ω₁ vs ω₂ ──────────────────
+    ax = axes[1, 2]
+    style_ax(ax)
+    sc2 = ax.scatter(omega1, omega2, c=times, cmap="viridis", s=1, alpha=0.6, rasterized=True)
+    cb2 = plt.colorbar(sc2, ax=ax)
+    cb2.set_label("Time (s)", color=MUTED, fontsize=9)
+    cb2.ax.yaxis.set_tick_params(color=MUTED)
+    plt.setp(cb2.ax.yaxis.get_ticklabels(), color=MUTED)
+    ax.set_title("Angular Velocity Portrait  ω₁ vs ω₂", color=TEXT, fontsize=10)
+    ax.set_xlabel("ω₁ (rad/s)", color=MUTED, fontsize=9)
+    ax.set_ylabel("ω₂ (rad/s)", color=MUTED, fontsize=9)
+
+    plt.tight_layout()
+    fig.savefig(str(PLOT_PATH), dpi=150, bbox_inches="tight", facecolor=BG)
+    plt.close(fig)
+    print("  Plots saved.")
+
+
+# ── entry point ───────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    times, theta1, theta2, omega1, omega2, frames = run_simulation()
+    save_video(frames)
+    plot_states(times, theta1, theta2, omega1, omega2)
