@@ -1,0 +1,26 @@
+<mujoco model="t_handle">
+
+  <option gravity="0 0 0" integrator="RK4" timestep="0.001"/>
+
+  <visual>
+    <headlight diffuse="0.55 0.55 0.55" ambient="0.30 0.30 0.30" specular="0.10 0.10 0.10"/>
+    <global offwidth="1920" offheight="1080"/>
+  </visual>
+
+  <asset>
+    <material name="steel" rgba="0.62 0.66 0.72 1.00"
+              reflectance="0.60" shininess="1.00"/>
+  </asset>
+
+  <worldbody>
+    <body name="t_handle">
+      <freejoint name="free"/>
+
+      <geom name="bar" type="box" size="0.1 0.01 0.01" 
+            material="steel" density="7700"/>
+      <geom name="handle" type="box" size="0.01 0.05 0.01" pos="0 0.06 0"
+            material="steel" density="7700"/>
+    </body>
+  </worldbody>
+
+</mujoco>
