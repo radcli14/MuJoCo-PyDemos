@@ -1,14 +1,17 @@
 <article class="demo-card h-100">
   <a href="{{ demo.url | relative_url }}" tabindex="-1" aria-hidden="true">
+    {% assign thumb_pos = demo.thumbnail_position | default: "center" %}
     {% if demo.youtube %}
     <img src="https://img.youtube.com/vi/{{ demo.youtube }}/mqdefault.jpg"
          alt="{{ demo.title }} preview"
          class="demo-card-thumb"
+         style="object-position: {{ thumb_pos }}"
          loading="lazy">
     {% elsif demo.thumbnail %}
     <img src="{{ demo.thumbnail | relative_url }}"
          alt="{{ demo.title }} preview"
          class="demo-card-thumb"
+         style="object-position: {{ thumb_pos }}"
          loading="lazy">
     {% endif %}
   </a>
