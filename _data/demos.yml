@@ -23,3 +23,16 @@
     - rigid body
     - angular momentum
     - gyroscopic coupling
+
+- id: t_handle
+  title: "T-Handle"
+  description: >-
+    A free-floating T-shaped body in zero gravity demonstrating the intermediate
+    axis theorem — periodic 180° flipping while angular momentum and kinetic
+    energy remain exactly conserved.
+  url: /t_handle/
+  thumbnail: /t_handle/t_handle_states.png
+  tags:
+    - rigid body
+    - angular momentum
+    - intermediate axis
