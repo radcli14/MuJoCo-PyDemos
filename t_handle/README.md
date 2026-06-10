@@ -10,6 +10,8 @@ description: >-
   direction while angular momentum and kinetic energy remain exactly conserved.
   The same behavior has been observed aboard the International Space Station
   with real tools drifting in microgravity.
+youtube: GwiwqMzdDiQ
+date: 2026-06-10
 plot_image: /t_handle/t_handle_states.png
 image: /t_handle/t_handle_states.png
 tags: [rigid body, angular momentum, intermediate axis]

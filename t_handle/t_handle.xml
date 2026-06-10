@@ -13,8 +13,8 @@
     <!-- emission="1" makes the logo self-illuminate, independent of scene lighting -->
     <material name="logo_mat"   texture="shield_tex" texrepeat="1 1" rgba="1 1 1 1"
                                 emission="1"/>
-    <material name="steel"      rgba="0.62 0.66 0.72 1.00"
-                                reflectance="0.60" shininess="1.00"/>
+    <material name="steel"      rgba="0.78 0.82 0.88 1.00"
+                                reflectance="0.92" specular="1.0" shininess="1.00"/>
     <material name="steel_dark" rgba="0.28 0.30 0.34 1.00"
                                 reflectance="0.20" shininess="0.15"/>
   </asset>
