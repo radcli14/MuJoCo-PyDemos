@@ -53,7 +53,7 @@ def run_simulation():
     mujoco.mj_forward(model, data)
 
     renderer = mujoco.Renderer(model, height=RENDER_H, width=RENDER_W)
-    cam = make_free_camera(lookat=(0.0, 0.02, 0.0), distance=0.65,
+    cam = make_free_camera(lookat=(0.0, 0.02, 0.0), distance=0.314159,
                            azimuth=135.0, elevation=-30.0)
 
     dt           = model.opt.timestep
