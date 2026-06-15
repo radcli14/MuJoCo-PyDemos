@@ -13,6 +13,7 @@ description: >-
 youtube: GwiwqMzdDiQ
 date: 2026-06-10
 plot_image: /t_handle/t_handle_states.png
+plot_image_thumb: /t_handle/t_handle_states_thumb.png
 image: /t_handle/t_handle_states.png
 tags: [rigid body, angular momentum, intermediate axis]
 specs:
