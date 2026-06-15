@@ -10,6 +10,7 @@ description: >-
 youtube: TjvpU8pFmmM
 date: 2026-06-06
 plot_image: /rattleback/rattleback_states.png
+plot_image_thumb: /rattleback/rattleback_states_thumb.png
 image: "https://img.youtube.com/vi/TjvpU8pFmmM/maxresdefault.jpg"
 tags: [rigid body, angular momentum, gyroscopic coupling]
 specs:

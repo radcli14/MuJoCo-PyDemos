@@ -54,7 +54,8 @@ layout: default
       {% if page.plot_image %}
       <figure class="mb-3">
         <a href="{{ page.plot_image | relative_url }}" target="_blank" rel="noopener">
-          <img src="{{ page.plot_image | relative_url }}"
+          {% assign thumb_src = page.plot_image_thumb | default: page.plot_image %}
+          <img src="{{ thumb_src | relative_url }}"
                alt="{{ page.title }} state plots"
                class="plot-img"
                loading="lazy">

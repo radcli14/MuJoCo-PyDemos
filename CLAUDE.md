@@ -38,9 +38,10 @@ The header of the `README.md` file will contain the following fields:
 | `subtitle`    | Short explanation of the model, keep to one line    |
 | `description` | Longer explanation of the model, 2-4 sentences      |
 | `youtube`     | YouTube video ID, I will provide if I upload one    |
-| `date`        | Publish date in `YYYY-MM-DD` format; required when `youtube` is set (populates `uploadDate` in VideoObject schema) |
-| `plot_image`  | Generally the `newmodel/newmodel_states.png` file.  |
-| `image`       | Can be the plot image, or `maxresdefault.jpg` from YouTube, this renders on home page |
+| `date`            | Publish date in `YYYY-MM-DD` format; use the date of the first git commit that added the demo (`git log --format="%ad" --date=short -- newmodel/README.md \| tail -1`). Required when `youtube` is set (populates `uploadDate` in VideoObject schema). |
+| `plot_image`      | Generally the `newmodel/newmodel_states.png` file. |
+| `plot_image_thumb` | Compressed version for faster sidebar loading. Generate with `pngquant --quality=70-85 --output newmodel/newmodel_states_thumb.png --force newmodel/newmodel_states.png`. The layout shows the thumb and links to the full-res `plot_image` on click. |
+| `image`           | Can be the plot image, or `maxresdefault.jpg` from YouTube, this renders on home page |
 | `tags`        | Generally use three tags, physics-related           |
 | `specs`       | Generates a table on the right side, format as list of `- { label: "Parameter name", value: "Numbers or description" }` |
 | `source_dir`  | Generally `newmodel`                                 |
