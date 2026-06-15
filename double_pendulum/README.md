@@ -60,6 +60,23 @@ The inertia tilt `euler="0 0 20"` technique used in the rattleback is intentiona
 
 The static door body behind the pendulum uses a `type="plane"` geom to carry the DC Engineer shield as a texture — MuJoCo 2D textures render correctly on plane geoms but not on box faces.
 
+## Video
+
+The video shows the two links — red for link 1 (attached to the pivot), blue for link 2 — starting nearly vertical and slowly tilting away from the top.
+The first several seconds look almost periodic as the small initial angle drives low-amplitude oscillation, but within a few cycles the motion becomes visibly irregular and the links begin tumbling in seemingly random directions.
+Lunar gravity keeps the swings slow enough that each individual tumble and reversal can be followed, but the long-term trajectory is entirely unpredictable.
+
+## Plots
+
+The six panels show the evolution of both links over the full 31.4-second run.
+
+The **top row** contains θ₁ (red) and θ₂ (blue) in degrees, alongside the **end-cap position trace** — the x-z path of the tip of link 2 colored by time from purple (early) to yellow (late).
+The angle histories begin as smooth near-sinusoidal oscillations and quickly become irregular large-amplitude excursions as chaos develops.
+The position trace starts as a narrow arc near the top of the frame and progressively fills a wider region, showing the trajectory becoming space-filling rather than repeating.
+
+The **bottom row** contains ω₁ and ω₂ (angular velocities of each link), and the **angular velocity portrait** (ω₁ vs ω₂) as a time-colored scatter.
+The portrait contains no closed orbits — the trajectory does not revisit the same region in a regular pattern — which visually confirms the non-periodic, chaotic character of the motion.
+
 ## Running the Simulation
 
 ```bash
