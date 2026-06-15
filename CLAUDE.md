@@ -38,13 +38,19 @@ The header of the `README.md` file will contain the following fields:
 | `subtitle`    | Short explanation of the model, keep to one line    |
 | `description` | Longer explanation of the model, 2-4 sentences      |
 | `youtube`     | YouTube video ID, I will provide if I upload one    |
-| `date`        | Publish date in `YYYY-MM-DD` format; required when `youtube` is set (populates `uploadDate` in VideoObject schema) |
-| `plot_image`  | Generally the `newmodel/newmodel_states.png` file.  |
-| `image`       | Can be the plot image, or `maxresdefault.jpg` from YouTube, this renders on home page |
+| `date`            | Publish date in `YYYY-MM-DD` format; use the date of the first git commit that added the demo (`git log --format="%ad" --date=short -- newmodel/README.md \| tail -1`). Required when `youtube` is set (populates `uploadDate` in VideoObject schema). |
+| `plot_image`      | Generally the `newmodel/newmodel_states.png` file. |
+| `plot_image_thumb` | Compressed version for faster sidebar loading. Generate with `pngquant --quality=70-85 --output newmodel/newmodel_states_thumb.png --force newmodel/newmodel_states.png`. The layout shows the thumb and links to the full-res `plot_image` on click. |
+| `image`           | Can be the plot image, or `maxresdefault.jpg` from YouTube, this renders on home page. Do not default to YouTube — choose whichever image is more illustrative. Use the plot when it conveys the physics clearly; use YouTube when the still frame is more visually striking or representative. |
 | `tags`        | Generally use three tags, physics-related           |
 | `specs`       | Generates a table on the right side, format as list of `- { label: "Parameter name", value: "Numbers or description" }` |
 | `source_dir`  | Generally `newmodel`                                 |
 | `files`       | Generally `- { label: "MJCF Model", name: "newmodel.xml"}` and `- { label: "Python Script", name: "newmodel_"}`, may also include other files |
+
+Each demo also requires an entry in `_data/demos.yml` with `id`, `title`, `description`, `url`, and `tags`.
+The home page card image comes from the `thumbnail` field (local path, use the compressed `_thumb.png`) or `youtube` (YouTube ID, uses `mqdefault.jpg` automatically).
+Do not default to `youtube` — choose `thumbnail` when the plot image conveys the physics clearly, and `youtube` when the video still frame is more striking.
+A demo may have both fields; `youtube` takes precedence in the card template.
 
 Content in the header will render either in a right-hand panel on desktop, or below the main readme content on mobile, where "main" content refers to any markdown-formatted text underneath the header.
 Use the main readme content to explain items in the XML or Python script that are non-obvious, or that are unique or novel to the example that is being modeled, with code snippets included if they add value. 

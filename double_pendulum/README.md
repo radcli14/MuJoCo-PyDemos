@@ -11,7 +11,8 @@ youtube: M5NC8nGev6o
 youtube_short: true
 date: 2026-06-08
 plot_image: /double_pendulum/double_pendulum_states.png
-image: /double_pendulum/double_pendulum_states.png
+plot_image_thumb: /double_pendulum/double_pendulum_states_thumb.png
+image: "https://img.youtube.com/vi/M5NC8nGev6o/maxresdefault.jpg"
 tags: [chaos, rigid body, nonlinear dynamics]
 specs:
   - { label: "Integrator",   value: "RK4, Δt = 1 ms" }
