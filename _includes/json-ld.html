@@ -1,28 +1,45 @@
 {% comment %}
-  BreadcrumbList schema fires on every page — matches the Home › Title nav trail.
+  Structured data (JSON-LD) for rich search results.
+  jekyll-seo-tag already emits WebSite / WebPage schemas; this adds:
+    BreadcrumbList — all demo pages (Google rich breadcrumb in SERPs)
+    VideoObject    — demo pages with a YouTube embed
+    TechArticle    — all demo pages
+  Demo pages are identified by the presence of source_dir in front matter.
 {% endcomment %}
+
+{% assign is_demo = false %}
+{% if page.source_dir %}{% assign is_demo = true %}{% endif %}
+
+{% if is_demo %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site.url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "{{ page.title | escape }}", "item": "{{ page.url | absolute_url }}" }
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "MuJoCo PyDemos",
+      "item": "{{ site.url }}/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ page.title | jsonify }},
+      "item": {{ page.url | absolute_url | jsonify }}
+    }
   ]
 }
 </script>
+{% endif %}
 
-{% comment %}
-  VideoObject schema for any page with a youtube front-matter variable.
-  jekyll-seo-tag already emits WebSite / WebPage schemas; this adds the video.
-{% endcomment %}
 {% if page.youtube %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "VideoObject",
-  "name": "{{ page.title | escape }} — MuJoCo Simulation",
-  "description": "{{ page.description | strip_newlines | escape }}",
+  "name": {{ page.title | append: " — MuJoCo Simulation" | jsonify }},
+  "description": {{ page.description | strip_newlines | jsonify }},
   "thumbnailUrl": "https://img.youtube.com/vi/{{ page.youtube }}/maxresdefault.jpg",
   "embedUrl": "https://www.youtube.com/embed/{{ page.youtube }}",
   "uploadDate": "{{ page.date | date: '%Y-%m-%d' }}",
@@ -31,6 +48,36 @@
     "@type": "Organization",
     "name": "DC Engineer",
     "url": "https://dc-engineer.com"
+  }
+}
+</script>
+{% endif %}
+
+{% if is_demo %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": {{ page.title | jsonify }},
+  "description": {{ page.description | strip_newlines | jsonify }},
+  "url": {{ page.url | absolute_url | jsonify }},
+  {% if page.image %}"image": {% if page.image contains "://" %}{{ page.image | jsonify }}{% else %}{{ page.image | absolute_url | jsonify }}{% endif %},{% endif %}
+  "author": {
+    "@type": "Person",
+    "name": "DC Engineer",
+    "url": "https://armor.dc-engineer.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DC Engineer",
+    "url": "https://armor.dc-engineer.com"
+  },
+  {% if page.tags %}"keywords": {{ page.tags | join: ", " | jsonify }},{% endif %}
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "MuJoCo",
+    "applicationCategory": "Physics Simulation",
+    "url": "https://mujoco.org"
   }
 }
 </script>
