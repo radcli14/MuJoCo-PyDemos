@@ -45,3 +45,5 @@ exclude:
   - requirements.txt
   - Gemfile
   - Gemfile.lock
+  - CLAUDE.md        # Claude Code context file — not a site page
+  - common.py        # already covered by **/*.py but listed explicitly
