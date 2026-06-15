@@ -6,7 +6,7 @@
     motion becomes chaotic within seconds — a classic demonstration of
     sensitive dependence on initial conditions.
   url: /double_pendulum/
-  youtube: M5NC8nGev6o
+  thumbnail: /double_pendulum/double_pendulum_states_thumb.png
   tags:
     - chaos
     - rigid body
