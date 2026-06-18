@@ -4,6 +4,8 @@ A series of demonstrations of the [MuJoCo](https://mujoco.org) physics engine us
 
 See [SETUP.md](SETUP.md) for environment and installation instructions.
 
+The site is rendered at [mujoco.dc-engineer.com](https://mujoco.dc-engineer.com)
+
 ## Demos
 
 - [**Rattleback (Celtic Stone)**](rattleback/) — an ellipsoidal stone whose tilted
