@@ -1,8 +1,3 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js';
-// mujoco.js is served from our own origin so the browser treats it as
-// same-origin and allows the static import.  The 9.7 MB mujoco.wasm is
-// fetched on demand from jsDelivr via the locateFile override below.
 import loadMujoco from '/assets/wasm/mujoco.js';
 
 const MUJOCO_CDN = 'https://cdn.jsdelivr.net/npm/@mujoco/mujoco@3.10.0';
@@ -11,6 +6,11 @@ const statusEl  = document.getElementById('mujoco-status');
 const resetBtn  = document.getElementById('mujoco-reset');
 const container = document.getElementById('mujoco-canvas-container');
 const canvas    = document.getElementById('mujoco-canvas');
+
+function setStatus(msg) {
+  statusEl.textContent = msg;
+  statusEl.style.display = 'block';
+}
 
 // Ball drops from 2 m, bounces on a 10×10 m floor.
 const XML = `\
@@ -26,7 +26,7 @@ const XML = `\
   </worldbody>
 </mujoco>`;
 
-function makeCheckerTexture() {
+function makeCheckerTexture(THREE) {
   const sz = 512, tile = 64;
   const c = Object.assign(document.createElement('canvas'), { width: sz, height: sz });
   const ctx = c.getContext('2d');
@@ -41,9 +41,36 @@ function makeCheckerTexture() {
   return tex;
 }
 
+// Wait until the container has a non-zero layout size (important on mobile,
+// where the element may be zero-height until the browser finishes layout).
+function waitForSize(el) {
+  return new Promise(resolve => {
+    if (el.clientWidth > 0 && el.clientHeight > 0) { resolve(); return; }
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth > 0 && el.clientHeight > 0) { ro.disconnect(); resolve(); }
+    });
+    ro.observe(el);
+  });
+}
+
 try {
+  setStatus('Loading graphics library…');
+  // esm.sh resolves bare specifiers ('three') server-side, so OrbitControls
+  // works in any browser without an import map.
+  const ESM = 'https://esm.sh/three@0.170.0';
+  const [THREE, { OrbitControls }] = await Promise.all([
+    import(`${ESM}`),
+    import(`${ESM}/examples/jsm/controls/OrbitControls.js`),
+  ]);
+
+  // Check WebGL support before continuing.
+  const testCtx = canvas.getContext('webgl2') || canvas.getContext('webgl');
+  if (!testCtx) throw new Error('WebGL is not supported on this device or browser.');
+
+  setStatus('Downloading physics engine (~10 MB)…');
   const mj = await loadMujoco({ locateFile: f => `${MUJOCO_CDN}/${f}` });
 
+  setStatus('Building physics model…');
   const model   = mj.MjModel.from_xml_string(XML);
   const data    = new mj.MjData(model);
   const mjScene = new mj.MjvScene(model, 1000);
@@ -55,6 +82,9 @@ try {
   const nq = model.nq, nv = model.nv;
   const qpos0 = Float64Array.from({ length: nq }, (_, i) => data.qpos[i]);
   const qvel0 = Float64Array.from({ length: nv }, (_, i) => data.qvel[i]);
+
+  setStatus('Initializing renderer…');
+  await waitForSize(container);
 
   // ── Three.js ──────────────────────────────────────────────
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -81,7 +111,7 @@ try {
   sun.position.set(3, -3, 6);
   threeScene.add(sun);
 
-  const checkerTex = makeCheckerTexture();
+  const checkerTex = makeCheckerTexture(THREE);
   const meshPool   = []; // index matches MuJoCo scene.geoms index
 
   function getMesh(i, type, size, rgba) {
@@ -133,6 +163,7 @@ try {
 
   new ResizeObserver(() => {
     const w = container.clientWidth, h = container.clientHeight;
+    if (w === 0 || h === 0) return;
     cam3.aspect = w / h;
     cam3.updateProjectionMatrix();
     renderer.setSize(w, h);
@@ -144,8 +175,8 @@ try {
     mj.mj_forward(model, data);
   });
 
-  statusEl.style.display = 'none';
-  resetBtn.disabled = false;
+  setStatus('Starting simulation…');
+  let firstFrame = true;
 
   // ── Render loop ───────────────────────────────────────────
   (function animate() {
@@ -177,9 +208,15 @@ try {
 
     controls.update();
     renderer.render(threeScene, cam3);
+
+    if (firstFrame) {
+      firstFrame = false;
+      statusEl.style.display = 'none';
+      resetBtn.disabled = false;
+    }
   })();
 
 } catch (err) {
-  statusEl.textContent = `Failed to load: ${err.message}`;
+  setStatus(`Failed to load: ${err.message}`);
   statusEl.classList.add('mujoco-status--error');
 }
