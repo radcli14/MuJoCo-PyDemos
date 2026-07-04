@@ -19,8 +19,8 @@ const XML = `\
     <geom name="floor" type="plane" size="5 5 .1" rgba=".5 .5 .5 1"/>
     <body name="ball" pos="0 0 2">
       <joint type="free"/>
-      <!-- solref damping ratio 0.1 (underdamped) gives ~e=0.8 restitution -->
-      <geom type="sphere" size="0.15" rgba="0.9 0.2 0.2 1" mass="0.5" solref="0.005 0.1"/>
+      <!-- solref damping ratio 0.01 (nearly undamped) gives ~e=0.95 restitution -->
+      <geom type="sphere" size="0.15" rgba="0.9 0.2 0.2 1" mass="0.5" solref="0.005 0.01"/>
     </body>
   </worldbody>
 </mujoco>`;
