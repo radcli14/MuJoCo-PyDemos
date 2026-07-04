@@ -1,8 +1,11 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+// mujoco.js is served from our own origin so the browser treats it as
+// same-origin and allows the static import.  The 9.7 MB mujoco.wasm is
+// fetched on demand from jsDelivr via the locateFile override below.
+import loadMujoco from '/assets/wasm/mujoco.js';
 
-const MUJOCO_VERSION = '3.10.0';
-const CDN = `https://cdn.jsdelivr.net/npm/@mujoco/mujoco@${MUJOCO_VERSION}`;
+const MUJOCO_CDN = 'https://cdn.jsdelivr.net/npm/@mujoco/mujoco@3.10.0';
 
 const statusEl  = document.getElementById('mujoco-status');
 const resetBtn  = document.getElementById('mujoco-reset');
@@ -39,10 +42,7 @@ function makeCheckerTexture() {
 }
 
 try {
-  // Dynamic import so we can pass locateFile; static import would also work
-  // but the module would fetch mujoco.wasm relative to its own CDN URL anyway.
-  const { default: loadMujoco } = await import(`${CDN}/mujoco.js`);
-  const mj = await loadMujoco({ locateFile: f => `${CDN}/${f}` });
+  const mj = await loadMujoco({ locateFile: f => `${MUJOCO_CDN}/${f}` });
 
   const model   = mj.MjModel.from_xml_string(XML);
   const data    = new mj.MjData(model);

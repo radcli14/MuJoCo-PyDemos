@@ -8,7 +8,7 @@ sitemap: false
 
 A red ball dropping onto a checkered floor, simulated live in the browser using the MuJoCo physics engine compiled to WebAssembly and rendered with Three.js.
 
-<p id="mujoco-status" class="mujoco-status">Loading MuJoCo WASM&hellip;</p>
+<p id="mujoco-status" class="mujoco-status">Downloading MuJoCo WASM (~10 MB)&hellip;</p>
 
 <div id="mujoco-canvas-container">
   <canvas id="mujoco-canvas"></canvas>
