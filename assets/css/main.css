@@ -774,6 +774,61 @@ a.inline-code-link:hover code {
 ::-webkit-scrollbar-thumb { background: var(--dc-border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #2a4060; }
 
+/* ── MuJoCo WASM viewer (catcher page) ────────────────────── */
+#mujoco-canvas-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--dc-border);
+  background: #121e2d;
+  margin-bottom: 1rem;
+}
+
+#mujoco-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mujoco-status {
+  font-size: 0.9rem;
+  color: var(--dc-muted);
+  margin-bottom: 0.75rem;
+  min-height: 1.3em;
+}
+
+.mujoco-status--error { color: #f87171; }
+
+.mujoco-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-mujoco-reset {
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--dc-border);
+  background: var(--dc-card);
+  color: var(--dc-text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-mujoco-reset:hover:not(:disabled) {
+  border-color: var(--dc-accent);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+.btn-mujoco-reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Utility ───────────────────────────────────────────────── */
 .text-accent  { color: var(--dc-accent) !important; }
 .text-dc-muted { color: var(--dc-muted) !important; }
