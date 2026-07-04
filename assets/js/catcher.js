@@ -1,5 +1,3 @@
-import loadMujoco from '/assets/wasm/mujoco.js';
-
 const MUJOCO_CDN = 'https://cdn.jsdelivr.net/npm/@mujoco/mujoco@3.10.0';
 
 const statusEl  = document.getElementById('mujoco-status');
@@ -12,7 +10,7 @@ function setStatus(msg) {
   statusEl.style.display = 'block';
 }
 
-// Ball drops from 2 m, bounces on a 10×10 m floor.
+// Ball drops from 2 m, bounces on a 10x10 m floor.
 const XML = `\
 <mujoco>
   <option timestep="0.002"/>
@@ -21,7 +19,8 @@ const XML = `\
     <geom name="floor" type="plane" size="5 5 .1" rgba=".5 .5 .5 1"/>
     <body name="ball" pos="0 0 2">
       <joint type="free"/>
-      <geom type="sphere" size="0.15" rgba="0.9 0.2 0.2 1" mass="0.5"/>
+      <!-- solref damping ratio 0.1 (underdamped) gives ~e=0.8 restitution -->
+      <geom type="sphere" size="0.15" rgba="0.9 0.2 0.2 1" mass="0.5" solref="0.005 0.1"/>
     </body>
   </worldbody>
 </mujoco>`;
@@ -54,7 +53,7 @@ function waitForSize(el) {
 }
 
 try {
-  setStatus('Loading graphics library…');
+  setStatus('Loading graphics library...');
   // esm.sh resolves bare specifiers ('three') server-side, so OrbitControls
   // works in any browser without an import map.
   const ESM = 'https://esm.sh/three@0.170.0';
@@ -67,10 +66,11 @@ try {
   const testCtx = canvas.getContext('webgl2') || canvas.getContext('webgl');
   if (!testCtx) throw new Error('WebGL is not supported on this device or browser.');
 
-  setStatus('Downloading physics engine (~10 MB)…');
+  setStatus('Downloading physics engine (~10 MB)...');
+  const { default: loadMujoco } = await import(`${MUJOCO_CDN}/mujoco.js`);
   const mj = await loadMujoco({ locateFile: f => `${MUJOCO_CDN}/${f}` });
 
-  setStatus('Building physics model…');
+  setStatus('Building physics model...');
   const model   = mj.MjModel.from_xml_string(XML);
   const data    = new mj.MjData(model);
   const mjScene = new mj.MjvScene(model, 1000);
@@ -83,10 +83,10 @@ try {
   const qpos0 = Float64Array.from({ length: nq }, (_, i) => data.qpos[i]);
   const qvel0 = Float64Array.from({ length: nv }, (_, i) => data.qvel[i]);
 
-  setStatus('Initializing renderer…');
+  setStatus('Initializing renderer...');
   await waitForSize(container);
 
-  // ── Three.js ──────────────────────────────────────────────
+  // -- Three.js --
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(container.clientWidth, container.clientHeight);
@@ -149,7 +149,7 @@ try {
     return mesh;
   }
 
-  // MuJoCo provides a row-major 3×3 rotation + world position.
+  // MuJoCo provides a row-major 3x3 rotation + world position.
   // THREE.Matrix4.set() also takes row-major, so we map directly.
   function applyPose(mesh, g) {
     mesh.matrix.set(
@@ -175,10 +175,10 @@ try {
     mj.mj_forward(model, data);
   });
 
-  setStatus('Starting simulation…');
+  setStatus('Starting simulation...');
   let firstFrame = true;
 
-  // ── Render loop ───────────────────────────────────────────
+  // -- Render loop --
   (function animate() {
     requestAnimationFrame(animate);
 
