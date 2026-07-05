@@ -8,7 +8,7 @@ const MUJOCO_CDN = 'https://cdn.jsdelivr.net/npm/@mujoco/mujoco@3.10.0';
 const ESM        = 'https://esm.sh/three@0.170.0';
 
 function makeCheckerTexture(THREE) {
-  const sz = 512, tile = 64;
+  const sz = 512, tile = sz / 2; // 2x2 checker per texture; repeat is set per-plane in getMesh
   const c = Object.assign(document.createElement('canvas'), { width: sz, height: sz });
   const ctx = c.getContext('2d');
   for (let row = 0; row < sz; row += tile)
@@ -18,7 +18,6 @@ function makeCheckerTexture(THREE) {
     }
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(10, 10);
   return tex;
 }
 
@@ -38,7 +37,9 @@ export async function initMujocoViewer({
   xml,
   cameraPos    = [0, -5, 3],
   cameraTarget = [0, 0, 0.5],
-  onSceneReady,   // async ({ threeScene, THREE, ESM }) — add scene-specific objects
+  floorOffset  = 0,    // visual-only z offset applied to the floor plane mesh (m)
+  onModelReady,        // (mj, model, data) — set initial conditions before state snapshot
+  onSceneReady,        // async ({ threeScene, THREE, ESM }) — add scene-specific objects
 } = {}) {
   const statusEl  = document.getElementById('mujoco-status');
   const resetBtn  = document.getElementById('mujoco-reset');
@@ -72,6 +73,9 @@ export async function initMujocoViewer({
     const camMj   = new mj.MjvCamera();
     const perturb = new mj.MjvPerturb();
 
+    // Allow the scene script to set initial positions/velocities before snapshot.
+    if (onModelReady) onModelReady(mj, model, data);
+
     const nq = model.nq, nv = model.nv;
     const qpos0 = Float64Array.from({ length: nq }, (_, i) => data.qpos[i]);
     const qvel0 = Float64Array.from({ length: nv }, (_, i) => data.qvel[i]);
@@ -87,7 +91,7 @@ export async function initMujocoViewer({
     threeScene.background = new THREE.Color(0x121e2d);
 
     const cam3 = new THREE.PerspectiveCamera(
-      45, container.clientWidth / container.clientHeight, 0.1, 100
+      45, container.clientWidth / container.clientHeight, 0.1, 500
     );
     cam3.position.set(...cameraPos);
     cam3.up.set(0, 0, 1); // MuJoCo is Z-up
@@ -118,11 +122,14 @@ export async function initMujocoViewer({
       let geo;
       if      (type === G.mjGEOM_SPHERE.value)
         geo = new THREE.SphereGeometry(size[0], 32, 16);
-      else if (type === G.mjGEOM_PLANE.value)
-        geo = new THREE.PlaneGeometry(
-          size[0] > 0 ? size[0] * 2 : 20,
-          size[1] > 0 ? size[1] * 2 : 20
-        );
+      else if (type === G.mjGEOM_PLANE.value) {
+        const pw = size[0] > 0 ? size[0] * 2 : 20;
+        const ph = size[1] > 0 ? size[1] * 2 : 20;
+        geo = new THREE.PlaneGeometry(pw, ph);
+        // 1 m per checker cell: texture has 2 cells (one light, one dark) per repeat
+        checkerTex.repeat.set(pw / 2, ph / 2);
+        checkerTex.needsUpdate = true;
+      }
       else if (type === G.mjGEOM_BOX.value)
         geo = new THREE.BoxGeometry(size[0]*2, size[1]*2, size[2]*2);
       else if (type === G.mjGEOM_CYLINDER.value)
@@ -195,7 +202,14 @@ export async function initMujocoViewer({
       for (let i = 0; i < n; i++) {
         const g    = geoms.get(i);
         const mesh = getMesh(i, g.type, g.size, g.rgba);
-        if (mesh) { mesh.visible = true; applyPose(mesh, g); }
+        if (mesh) {
+          mesh.visible = true;
+          applyPose(mesh, g);
+          // Visual-only z offset for the floor plane (e.g. to sit below a surface mesh).
+          // THREE.Matrix4 is column-major; elements[14] is the z translation.
+          if (floorOffset !== 0 && g.type === G.mjGEOM_PLANE.value)
+            mesh.matrix.elements[14] += floorOffset;
+        }
         g.delete();
       }
       geoms.delete();
