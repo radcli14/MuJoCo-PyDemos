@@ -27,8 +27,8 @@ const XML = `\
     </body>
     <!-- Catcher's mitt: cylinder, flat face toward pitcher; wrist hinge at left (-X) edge -->
     <body name="glove" pos="-0.12 -1.219 0.610">
-      <!-- tau=0.1 s critically-damped: k=I*wn^2=1.82 N·m/rad, c=0.36 N·m·s/rad -->
-      <joint name="wrist" type="hinge" axis="0 0 1" stiffness="1.82" damping="0.36"/>
+      <!-- tau=0.05 s critically-damped: k=I/tau^2=7.28 N·m/rad, c=0.73 N·m·s/rad -->
+      <joint name="wrist" type="hinge" axis="0 0 1" stiffness="7.28" damping="0.73"/>
       <geom name="glove" type="cylinder" size="0.12 0.025"
             pos="0.12 0 0" euler="-90 0 0"
             rgba="0.2 0.8 0.3 1" mass="1"/>
