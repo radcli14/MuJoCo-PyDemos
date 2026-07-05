@@ -18,4 +18,4 @@ A red ball dropping onto a checkered floor, simulated live in the browser using 
   <button id="mujoco-reset" class="btn-mujoco-reset" disabled>Reset</button>
 </div>
 
-<script type="module" src="{{ '/assets/js/catcher.js' | relative_url }}"></script>
+<script type="module" src="{{ '/catcher/catcher.js' | relative_url }}"></script>
