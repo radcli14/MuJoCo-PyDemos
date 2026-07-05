@@ -17,6 +17,7 @@ const XML = `\
 
 await initMujocoViewer({
   xml: XML,
+  floorOffset: -0.01,  // grid sits 1 cm below the home plate surface
   onSceneReady: async ({ threeScene, ESM }) => {
     const { GLTFLoader } = await import(`${ESM}/examples/jsm/loaders/GLTFLoader.js`);
     const gltf = await new Promise((resolve, reject) =>

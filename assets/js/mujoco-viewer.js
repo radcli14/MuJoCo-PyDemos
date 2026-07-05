@@ -8,7 +8,7 @@ const MUJOCO_CDN = 'https://cdn.jsdelivr.net/npm/@mujoco/mujoco@3.10.0';
 const ESM        = 'https://esm.sh/three@0.170.0';
 
 function makeCheckerTexture(THREE) {
-  const sz = 512, tile = 64;
+  const sz = 512, tile = sz / 2; // 2x2 checker per texture → 1 m per cell at repeat.set(5,5)
   const c = Object.assign(document.createElement('canvas'), { width: sz, height: sz });
   const ctx = c.getContext('2d');
   for (let row = 0; row < sz; row += tile)
@@ -18,7 +18,7 @@ function makeCheckerTexture(THREE) {
     }
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(10, 10);
+  tex.repeat.set(5, 5);
   return tex;
 }
 
@@ -38,7 +38,8 @@ export async function initMujocoViewer({
   xml,
   cameraPos    = [0, -5, 3],
   cameraTarget = [0, 0, 0.5],
-  onSceneReady,   // async ({ threeScene, THREE, ESM }) — add scene-specific objects
+  floorOffset  = 0,  // visual-only z offset applied to the floor plane mesh (m)
+  onSceneReady,      // async ({ threeScene, THREE, ESM }) — add scene-specific objects
 } = {}) {
   const statusEl  = document.getElementById('mujoco-status');
   const resetBtn  = document.getElementById('mujoco-reset');
@@ -195,7 +196,14 @@ export async function initMujocoViewer({
       for (let i = 0; i < n; i++) {
         const g    = geoms.get(i);
         const mesh = getMesh(i, g.type, g.size, g.rgba);
-        if (mesh) { mesh.visible = true; applyPose(mesh, g); }
+        if (mesh) {
+          mesh.visible = true;
+          applyPose(mesh, g);
+          // Visual-only z offset for the floor plane (e.g. to sit below a surface mesh).
+          // THREE.Matrix4 is column-major; elements[14] is the z translation.
+          if (floorOffset !== 0 && g.type === G.mjGEOM_PLANE.value)
+            mesh.matrix.elements[14] += floorOffset;
+        }
         g.delete();
       }
       geoms.delete();
