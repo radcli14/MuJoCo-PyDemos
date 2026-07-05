@@ -114,11 +114,10 @@ export async function initMujocoViewer({
 
     const checkerTex = makeCheckerTexture(THREE);
     const meshPool   = [];
+    const G          = mj.mjtGeom;
 
     function getMesh(i, type, size, rgba) {
       if (meshPool[i]) return meshPool[i];
-
-      const G = mj.mjtGeom;
       let geo;
       if      (type === G.mjGEOM_SPHERE.value)
         geo = new THREE.SphereGeometry(size[0], 32, 16);
