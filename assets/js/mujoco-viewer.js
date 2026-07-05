@@ -41,6 +41,8 @@ export async function initMujocoViewer({
   onModelReady,        // (mj, model, data) — set initial conditions before state snapshot
   onSceneReady,        // async ({ threeScene, THREE, ESM }) — add scene-specific objects
   onFrame,             // (mj, model, data, threeScene, THREE) — called each render iteration
+  autoRotate      = false,
+  autoRotateSpeed = 2.0,
 } = {}) {
   const statusEl  = document.getElementById('mujoco-status');
   const resetBtn  = document.getElementById('mujoco-reset');
@@ -101,6 +103,8 @@ export async function initMujocoViewer({
     controls.target.set(...cameraTarget);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
+    controls.autoRotate      = autoRotate;
+    controls.autoRotateSpeed = autoRotateSpeed;
     controls.update();
 
     threeScene.add(new THREE.AmbientLight(0xffffff, 0.4));

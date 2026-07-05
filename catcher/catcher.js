@@ -8,8 +8,8 @@ import { initMujocoViewer } from '/assets/js/mujoco-viewer.js';
 // 90 mph = 40.23 m/s
 //
 // Velocity to reach glove (0, -1.219, 0.610) from (0, 18.288, 1.829):
-//   Total ΔY = 19.507 m. Solve z(t)=0.610, |v|=40.23 m/s.
-//   Transit time t ≈ 0.484 s → vy ≈ -40.27 m/s, vz ≈ -0.14 m/s.
+//   Total dY = 19.507 m. Solve z(t)=0.610, |v|=40.23 m/s.
+//   Transit time t ~= 0.484 s -> vy ~= -40.27 m/s, vz ~= -0.14 m/s.
 
 const XML = `\
 <mujoco>
@@ -25,22 +25,22 @@ const XML = `\
       <joint type="free"/>
       <geom type="sphere" size="0.037" rgba="0.95 0.95 0.95 1" mass="0.145"/>
     </body>
-    <!-- Catcher arm: shoulder(-0.147,-0.708,0.820) → elbow(-0.138,-0.973,0.679) → wrist(-0.12,-1.219,0.610) -->
-    <!-- Shoulder ball joint: k=75 N·m/rad, c=15 N·m·s/rad (tau≈0.1 s, I≈0.75 kg·m²) -->
+    <!-- Catcher arm: shoulder(-0.147,-0.708,0.820) to elbow(-0.138,-0.973,0.679) to wrist(-0.12,-1.219,0.610) -->
+    <!-- Shoulder ball joint: k=75 N*m/rad, c=15 N*m*s/rad (tau~0.1 s, I~0.75 kg*m^2) -->
     <body name="upper_arm" pos="-0.147 -0.708 0.820">
       <joint name="shoulder" type="ball" stiffness="75" damping="15"/>
-      <geom type="capsule" fromto="0 0 0  0.009 -0.265 -0.141"
-            size="0.038" rgba="0.85 0.72 0.60 1" mass="2.0"/>
+      <geom type="capsule" pos="0.0045 -0.1325 -0.0705" size="0.038 0.150"
+            zaxis="0.009 -0.265 -0.141" rgba="0.85 0.72 0.60 1" mass="2.0"/>
       <body name="forearm" pos="0.009 -0.265 -0.141">
-        <!-- Elbow ball joint: k=17 N·m/rad, c=3.4 N·m·s/rad (tau≈0.1 s, I≈0.17 kg·m²) -->
+        <!-- Elbow ball joint: k=17 N*m/rad, c=3.4 N*m*s/rad (tau~0.1 s, I~0.17 kg*m^2) -->
         <joint name="elbow" type="ball" stiffness="17" damping="3.4"/>
-        <geom type="capsule" fromto="0 0 0  0.018 -0.246 -0.069"
-              size="0.030" rgba="0.85 0.72 0.60 1" mass="1.2"/>
+        <geom type="capsule" pos="0.009 -0.123 -0.0345" size="0.030 0.128"
+              zaxis="0.018 -0.246 -0.069" rgba="0.85 0.72 0.60 1" mass="1.2"/>
         <!-- Mitt: thin leather disc, wrist hinge at left (-X) edge -->
         <body name="glove" pos="0.018 -0.246 -0.069">
-          <!-- Wrist hinge: k=1.8 N·m/rad, c=0.36 N·m·s/rad (tau=0.1 s, I≈0.018 kg·m²) -->
+          <!-- Wrist hinge: k=1.8 N*m/rad, c=0.36 N*m*s/rad (tau=0.1 s, I~0.018 kg*m^2) -->
           <joint name="wrist" type="hinge" axis="0 0 1" stiffness="1.8" damping="0.36"/>
-          <geom name="glove" type="cylinder" size="0.12 0.00625"
+          <geom name="glove" type="cylinder" size="0.12 0.003"
                 pos="0.12 0 0" euler="-90 0 0"
                 rgba="0.80 0.40 0.10 1" mass="1"/>
         </body>
@@ -49,15 +49,17 @@ const XML = `\
   </worldbody>
 </mujoco>`;
 
-// Particle trail — initialized in onSceneReady, used in onFrame.
+// Particle trail -- initialized in onSceneReady, used in onFrame.
 let pGeo, pMat;
 const particles = [];   // { mesh, birthTime }
 
 await initMujocoViewer({
   xml: XML,
-  cameraPos:    [0, -6, 2],
-  cameraTarget: [0, 9, 1],   // look up the middle of the pitch
-  floorOffset:  -0.01,       // grid 1 cm below home plate surface
+  cameraPos:       [4, -3, 2],
+  cameraTarget:    [0, -1, 0.5],
+  floorOffset:     -0.01,       // grid 1 cm below home plate surface
+  autoRotate:      true,
+  autoRotateSpeed: 2.0,
 
   onModelReady: (mj, model, data) => {
     // Free joint qvel: [vx, vy, vz, wx, wy, wz]
