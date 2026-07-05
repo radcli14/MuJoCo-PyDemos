@@ -40,6 +40,7 @@ export async function initMujocoViewer({
   floorOffset  = 0,    // visual-only z offset applied to the floor plane mesh (m)
   onModelReady,        // (mj, model, data) — set initial conditions before state snapshot
   onSceneReady,        // async ({ threeScene, THREE, ESM }) — add scene-specific objects
+  onFrame,             // (mj, model, data, threeScene, THREE) — called each render iteration
 } = {}) {
   const statusEl  = document.getElementById('mujoco-status');
   const resetBtn  = document.getElementById('mujoco-reset');
@@ -213,6 +214,7 @@ export async function initMujocoViewer({
       }
       geoms.delete();
 
+      if (onFrame) onFrame(mj, model, data, threeScene, THREE);
       controls.update();
       renderer.render(threeScene, cam3);
 
