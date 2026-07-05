@@ -25,8 +25,14 @@ const XML = `\
       <joint type="free"/>
       <geom type="sphere" size="0.037" rgba="0.95 0.95 0.95 1" mass="0.145"/>
     </body>
-    <geom name="glove" type="sphere" size="0.12"
-          pos="0 -1.219 0.610" rgba="0.2 0.8 0.3 1"/>
+    <!-- Catcher's mitt: cylinder, flat face toward pitcher; wrist hinge at left (-X) edge -->
+    <body name="glove" pos="-0.12 -1.219 0.610">
+      <!-- tau=0.01 s critically-damped: k=I/tau^2=188 N·m/rad, c=3.8 N·m·s/rad -->
+      <joint name="wrist" type="hinge" axis="0 0 1" stiffness="188" damping="3.8"/>
+      <geom name="glove" type="cylinder" size="0.12 0.05"
+            pos="0.12 0 0" euler="-90 0 0"
+            rgba="0.2 0.8 0.3 1" mass="1"/>
+    </body>
   </worldbody>
 </mujoco>`;
 
