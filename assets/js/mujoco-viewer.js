@@ -138,8 +138,11 @@ export async function initMujocoViewer({
         // Pre-rotate geometry +90° around X so applyPose maps correctly.
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
       }
-      else if (type === G.mjGEOM_CAPSULE.value)
+      else if (type === G.mjGEOM_CAPSULE.value) {
         geo = new THREE.CapsuleGeometry(size[0], size[1]*2, 8, 16);
+        // Three.js CapsuleGeometry is Y-axis; MuJoCo capsule is Z-axis.
+        geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+      }
       else
         return null;
 
