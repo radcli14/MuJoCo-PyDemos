@@ -57,9 +57,10 @@ try {
   // esm.sh resolves bare specifiers ('three') server-side, so OrbitControls
   // works in any browser without an import map.
   const ESM = 'https://esm.sh/three@0.170.0';
-  const [THREE, { OrbitControls }] = await Promise.all([
+  const [THREE, { OrbitControls }, { GLTFLoader }] = await Promise.all([
     import(`${ESM}`),
     import(`${ESM}/examples/jsm/controls/OrbitControls.js`),
+    import(`${ESM}/examples/jsm/loaders/GLTFLoader.js`),
   ]);
 
   // Check WebGL support before continuing.
@@ -110,6 +111,12 @@ try {
   const sun = new THREE.DirectionalLight(0xffffff, 1.2);
   sun.position.set(3, -3, 6);
   threeScene.add(sun);
+
+  // Load home plate mesh (Z-up, same convention as the scene — no rotation needed).
+  const gltf = await new Promise((resolve, reject) =>
+    new GLTFLoader().load('/catcher/HomePlate.glb', resolve, undefined, reject)
+  );
+  threeScene.add(gltf.scene);
 
   const checkerTex = makeCheckerTexture(THREE);
   const meshPool   = []; // index matches MuJoCo scene.geoms index
