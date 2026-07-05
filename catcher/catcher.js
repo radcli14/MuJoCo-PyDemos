@@ -14,23 +14,19 @@ import { initMujocoViewer } from '/assets/js/mujoco-viewer.js';
 const XML = `\
 <mujoco>
   <option timestep="0.0005"/>
-  <contact>
-    <!-- Explicit ball-glove pair: tau=0.5ms, zeta=100 (heavily overdamped, sticky) -->
-    <pair geom1="ball" geom2="glove" solref="0.0005 100" solimp="0.99 0.999 0.001"/>
-  </contact>
+  <!-- tau=0.5ms (matches timestep, max contact stiffness), zeta=1 (critically damped, no bounce) -->
+  <default>
+    <geom solref="0.0005 1"/>
+  </default>
   <worldbody>
     <light pos="0 0 10" dir="0 0 -1" diffuse="1 1 1" specular="0.3 0.3 0.3"/>
     <geom name="floor" type="plane" size="20 20 .1" rgba=".5 .5 .5 1"/>
     <body name="ball" pos="0 18.288 1.829">
       <joint type="free"/>
-      <!-- solref: tau=timestep (max stiffness for floor bounce), zeta=0.01 (elastic) -->
-      <geom name="ball" type="sphere" size="0.037" rgba="0.95 0.95 0.95 1" mass="0.145" solref="0.0005 0.01"/>
+      <geom type="sphere" size="0.037" rgba="0.95 0.95 0.95 1" mass="0.145"/>
     </body>
-    <!-- Catcher glove: 4 ft behind plate, 2 ft up. contype=0 avoids floor collision;
-         ball contact is handled by the explicit <pair> above. -->
     <geom name="glove" type="sphere" size="0.12"
-          pos="0 -1.219 0.610" rgba="0.2 0.8 0.3 1"
-          contype="0" conaffinity="0"/>
+          pos="0 -1.219 0.610" rgba="0.2 0.8 0.3 1"/>
   </worldbody>
 </mujoco>`;
 
