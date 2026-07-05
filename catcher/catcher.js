@@ -25,13 +25,26 @@ const XML = `\
       <joint type="free"/>
       <geom type="sphere" size="0.037" rgba="0.95 0.95 0.95 1" mass="0.145"/>
     </body>
-    <!-- Catcher's mitt: cylinder, flat face toward pitcher; wrist hinge at left (-X) edge -->
-    <body name="glove" pos="-0.12 -1.219 0.610">
-      <!-- tau=0.05 s critically-damped: k=I/tau^2=7.28 N·m/rad, c=0.73 N·m·s/rad -->
-      <joint name="wrist" type="hinge" axis="0 0 1" stiffness="7.28" damping="0.73"/>
-      <geom name="glove" type="cylinder" size="0.12 0.025"
-            pos="0.12 0 0" euler="-90 0 0"
-            rgba="0.2 0.8 0.3 1" mass="1"/>
+    <!-- Catcher arm: shoulder(-0.147,-0.708,0.820) → elbow(-0.138,-0.973,0.679) → wrist(-0.12,-1.219,0.610) -->
+    <!-- Shoulder ball joint: k=75 N·m/rad, c=15 N·m·s/rad (tau≈0.1 s, I≈0.75 kg·m²) -->
+    <body name="upper_arm" pos="-0.147 -0.708 0.820">
+      <joint name="shoulder" type="ball" stiffness="75" damping="15"/>
+      <geom type="capsule" fromto="0 0 0  0.009 -0.265 -0.141"
+            size="0.038" rgba="0.85 0.72 0.60 1" mass="2.0"/>
+      <body name="forearm" pos="0.009 -0.265 -0.141">
+        <!-- Elbow ball joint: k=17 N·m/rad, c=3.4 N·m·s/rad (tau≈0.1 s, I≈0.17 kg·m²) -->
+        <joint name="elbow" type="ball" stiffness="17" damping="3.4"/>
+        <geom type="capsule" fromto="0 0 0  0.018 -0.246 -0.069"
+              size="0.030" rgba="0.85 0.72 0.60 1" mass="1.2"/>
+        <!-- Mitt: thin leather disc, wrist hinge at left (-X) edge -->
+        <body name="glove" pos="0.018 -0.246 -0.069">
+          <!-- Wrist hinge: k=1.8 N·m/rad, c=0.36 N·m·s/rad (tau=0.1 s, I≈0.018 kg·m²) -->
+          <joint name="wrist" type="hinge" axis="0 0 1" stiffness="1.8" damping="0.36"/>
+          <geom name="glove" type="cylinder" size="0.12 0.00625"
+                pos="0.12 0 0" euler="-90 0 0"
+                rgba="0.80 0.40 0.10 1" mass="1"/>
+        </body>
+      </body>
     </body>
   </worldbody>
 </mujoco>`;
