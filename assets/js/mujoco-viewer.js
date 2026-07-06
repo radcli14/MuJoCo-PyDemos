@@ -121,8 +121,9 @@ export async function initMujocoViewer({
     const meshPool   = [];
     const G          = mj.mjtGeom;
 
-    function getMesh(i, type, size, rgba) {
+    function getMesh(i, g) {
       if (meshPool[i]) return meshPool[i];
+      const type = g.type, size = g.size, rgba = g.rgba;
       let geo;
       if      (type === G.mjGEOM_SPHERE.value)
         geo = new THREE.SphereGeometry(size[0], 32, 16);
@@ -143,7 +144,11 @@ export async function initMujocoViewer({
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
       }
       else if (type === G.mjGEOM_CAPSULE.value) {
-        geo = new THREE.CapsuleGeometry(size[0], size[1]*2, 8, 16);
+        const r = size[0];
+        // mjv_updateScene does not reliably set size[1] for capsules; fall back to
+        // model.geom_size which always holds the correct cylindrical half-length.
+        const hl = (size[1] > 0) ? size[1] : model.geom_size[g.objid * 3 + 1];
+        geo = new THREE.CapsuleGeometry(r, hl * 2, 8, 16);
         // Three.js CapsuleGeometry is Y-axis; MuJoCo capsule is Z-axis.
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
       }
@@ -212,7 +217,7 @@ export async function initMujocoViewer({
 
       for (let i = 0; i < n; i++) {
         const g    = geoms.get(i);
-        const mesh = getMesh(i, g.type, g.size, g.rgba);
+        const mesh = getMesh(i, g);
         if (mesh) {
           mesh.visible = true;
           applyPose(mesh, g);
