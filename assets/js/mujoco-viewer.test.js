@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { createGeometry } from './mujoco-viewer.js';
+import { createGeometry, prepareXmlForWasm } from './mujoco-viewer.js';
 
 // Minimal mjtGeom enum matching MuJoCo's mjtGeom values.
 const G = {
@@ -94,5 +94,41 @@ describe('createGeometry', () => {
     const geo1 = createGeometry(G.mjGEOM_SPHERE.value, G, THREE, model, 1);
     expect(geo0.parameters.radius).toBeCloseTo(0.1);
     expect(geo1.parameters.radius).toBeCloseTo(0.4);
+  });
+});
+
+describe('prepareXmlForWasm', () => {
+  const SAMPLE = `<mujoco>
+  <asset>
+    <texture name="t" type="2d" file="../images/logo.png"/>
+    <material name="mat" texture="t"/>
+  </asset>
+  <worldbody>
+    <geom type="sphere" size="0.1" material="mat" rgba="1 0 0 1"/>
+  </worldbody>
+</mujoco>`;
+
+  it('strips the <asset> block entirely', () => {
+    const out = prepareXmlForWasm(SAMPLE);
+    expect(out).not.toContain('<asset');
+    expect(out).not.toContain('</asset>');
+    expect(out).not.toContain('logo.png');
+  });
+
+  it('removes material="..." attributes', () => {
+    const out = prepareXmlForWasm(SAMPLE);
+    expect(out).not.toContain('material=');
+  });
+
+  it('preserves rgba and other geom attributes', () => {
+    const out = prepareXmlForWasm(SAMPLE);
+    expect(out).toContain('rgba="1 0 0 1"');
+    expect(out).toContain('type="sphere"');
+  });
+
+  it('handles XML with no asset block unchanged', () => {
+    const plain = '<mujoco><worldbody><geom type="plane"/></worldbody></mujoco>';
+    const out = prepareXmlForWasm(plain);
+    expect(out).toContain('<geom type="plane"');
   });
 });
