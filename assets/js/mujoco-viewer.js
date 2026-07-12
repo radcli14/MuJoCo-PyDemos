@@ -35,6 +35,7 @@ function waitForSize(el) {
 
 export async function initMujocoViewer({
   xml,
+  xmlUrl,          // URL/path to an .xml file; fetched and resolved to a string before model load
   cameraPos    = [0, -5, 3],
   cameraTarget = [0, 0, 0.5],
   floorOffset  = 0,    // visual-only z offset applied to the floor plane mesh (m)
@@ -69,6 +70,11 @@ export async function initMujocoViewer({
     const mj = await loadMujoco({ locateFile: f => `${MUJOCO_CDN}/${f}` });
 
     setStatus('Building physics model...');
+    if (xmlUrl) {
+      const resp = await fetch(xmlUrl);
+      if (!resp.ok) throw new Error(`Failed to fetch model XML: ${resp.status}`);
+      xml = await resp.text();
+    }
     const model   = mj.MjModel.from_xml_string(xml);
     const data    = new mj.MjData(model);
     const mjScene = new mj.MjvScene(model, 1000);
