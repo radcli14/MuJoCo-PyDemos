@@ -29,17 +29,23 @@ const XML = `\
     <!-- Shoulder ball joint: k=75 N*m/rad, c=15 N*m*s/rad (tau~0.1 s, I~0.75 kg*m^2) -->
     <body name="upper_arm" pos="-0.147 -0.708 0.820">
       <joint name="shoulder" type="ball" stiffness="75" damping="15"/>
+      <geom type="sphere" size="0.025" rgba="0.20 0.45 0.85 1"
+            contype="0" conaffinity="0" mass="0"/>
       <geom type="capsule" fromto="0 0 0  0.009 -0.265 -0.141"
             size="0.038" rgba="0.85 0.72 0.60 1" mass="2.0"/>
       <body name="forearm" pos="0.009 -0.265 -0.141">
         <!-- Elbow ball joint: k=17 N*m/rad, c=3.4 N*m*s/rad (tau~0.1 s, I~0.17 kg*m^2) -->
         <joint name="elbow" type="ball" stiffness="17" damping="3.4"/>
+        <geom type="sphere" size="0.025" rgba="0.20 0.45 0.85 1"
+              contype="0" conaffinity="0" mass="0"/>
         <geom type="capsule" fromto="0 0 0  0.018 -0.246 -0.069"
               size="0.030" rgba="0.85 0.72 0.60 1" mass="1.2"/>
         <!-- Mitt: thin leather disc, wrist hinge at left (-X) edge -->
         <body name="glove" pos="0.018 -0.246 -0.069">
           <!-- Wrist hinge: k=1.8 N*m/rad, c=0.36 N*m*s/rad (tau=0.1 s, I~0.018 kg*m^2) -->
           <joint name="wrist" type="hinge" axis="0 0 1" stiffness="1.8" damping="0.36"/>
+          <geom type="sphere" size="0.025" rgba="0.20 0.45 0.85 1"
+                contype="0" conaffinity="0" mass="0"/>
           <geom name="glove" type="cylinder" size="0.12 0.003"
                 pos="0.12 0 0" euler="-90 0 0"
                 rgba="0.80 0.40 0.10 1" mass="1"/>
