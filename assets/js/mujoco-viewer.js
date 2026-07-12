@@ -144,16 +144,19 @@ export async function initMujocoViewer({
       else if (type === G.mjGEOM_BOX.value)
         geo = new THREE.BoxGeometry(size[0]*2, size[1]*2, size[2]*2);
       else if (type === G.mjGEOM_CYLINDER.value) {
-        geo = new THREE.CylinderGeometry(size[0], size[0], size[1]*2, 32);
+        const r  = size[0];
+        // g.size[1] from mjv_updateScene is unreliable; use model.geom_size directly.
+        const hl = model.geom_size[g.objid * 3 + 1];
+        geo = new THREE.CylinderGeometry(r, r, hl * 2, 32);
         // Three.js CylinderGeometry is Y-axis; MuJoCo cylinder is Z-axis.
         // Pre-rotate geometry +90° around X so applyPose maps correctly.
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
       }
       else if (type === G.mjGEOM_CAPSULE.value) {
         const r = size[0];
-        // mjv_updateScene does not reliably set size[1] for capsules; fall back to
-        // model.geom_size which always holds the correct cylindrical half-length.
-        const hl = (size[1] > 0) ? size[1] : model.geom_size[g.objid * 3 + 1];
+        // g.size[1] from mjv_updateScene is unreliable (may hold radius, not half-length).
+        // model.geom_size always holds the correct cylindrical half-length from the XML.
+        const hl = model.geom_size[g.objid * 3 + 1];
         geo = new THREE.CapsuleGeometry(r, hl * 2, 8, 16);
         // Three.js CapsuleGeometry is Y-axis; MuJoCo capsule is Z-axis.
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
