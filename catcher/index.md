@@ -1,12 +1,12 @@
 ---
 layout: page
 title: "Catcher"
-description: "MuJoCo physics running live in the browser via WebAssembly — a proof of concept for an in-browser robot simulation."
+description: "A baseball pitched at 90 mph toward a simplified catcher — articulated torso, arm, and mitt — simulated live in the browser via MuJoCo WebAssembly."
 permalink: /catcher/
 sitemap: false
 ---
 
-A red ball dropping onto a checkered floor, simulated live in the browser using the MuJoCo physics engine compiled to WebAssembly and rendered with Three.js.
+A baseball pitched at 90 mph toward a catcher modeled as a simplified torso, arm, and mitt — simulated live in the browser using the MuJoCo physics engine compiled to WebAssembly and rendered with Three.js.
 
 <p id="mujoco-status" class="mujoco-status">Downloading MuJoCo WASM (~10 MB)&hellip;</p>
 
