@@ -144,7 +144,10 @@ export async function initMujocoViewer({
       else if (type === G.mjGEOM_BOX.value)
         geo = new THREE.BoxGeometry(size[0]*2, size[1]*2, size[2]*2);
       else if (type === G.mjGEOM_CYLINDER.value) {
-        geo = new THREE.CylinderGeometry(size[0], size[0], size[1]*2, 32);
+        const r  = size[0];
+        // g.size[1] from mjv_updateScene is unreliable; use model.geom_size directly.
+        const hl = model.geom_size[g.objid * 3 + 1];
+        geo = new THREE.CylinderGeometry(r, r, hl * 2, 32);
         // Three.js CylinderGeometry is Y-axis; MuJoCo cylinder is Z-axis.
         // Pre-rotate geometry +90° around X so applyPose maps correctly.
         geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
