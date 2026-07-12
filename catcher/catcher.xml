@@ -11,13 +11,13 @@
       <joint type="free"/>
       <geom type="sphere" size="0.037" rgba="0.95 0.95 0.95 1" mass="0.145"/>
     </body>
-    <!-- Torso cross: neck(0,-1.80,1.00), hip(0,-1.80,0.55) -->
+    <!-- Torso cross: neck(0,-1.80,1.00), hip(0,-1.80,0.55), shoulders(±0.20,-1.80,0.77) -->
     <!-- Neck ball joint: k=300 N*m/rad, c=60 N*m*s/rad -->
     <body name="torso" pos="0 -1.80 1.00">
       <joint name="neck" type="ball" stiffness="300" damping="60"/>
       <geom type="capsule" fromto="0 0 0  0 0 -0.45"
             size="0.040" rgba="0.85 0.72 0.60 1" mass="20"/>
-      <geom type="capsule" fromto="-0.22 0 0  0.22 0 0"
+      <geom type="capsule" fromto="-0.20 0 -0.23  0.20 0 -0.23"
             size="0.030" rgba="0.85 0.72 0.60 1" mass="3"/>
     </body>
     <!-- Catcher arm: shoulder(-0.20,-1.80,0.77) to elbow(-0.40,-1.30,0.525) to wrist(-0.12,-1.219,0.610) -->
