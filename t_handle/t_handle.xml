@@ -25,17 +25,17 @@
     <body name="backdrop" pos="-0.21 0.21 -0.15">
       <geom name="logo_panel" type="plane" size="0.42 0.42 0.1"
             euler="90 45 0"
-            material="logo_mat" contype="0" conaffinity="0"/>
+            material="logo_mat" rgba="0 0 0 0" contype="0" conaffinity="0"/>
     </body>
 
     <body name="t_handle">
       <freejoint name="free"/>
 
-      <geom name="bar"        type="cylinder" fromto="-0.1 0 0  0.1 0 0"    size="0.013" material="steel"      density="7700"/>
-      <geom name="bar_cap_l"  type="cylinder" fromto="-0.104 0 0 -0.1 0 0"  size="0.017" material="steel_dark" density="7700"/>
-      <geom name="bar_cap_r"  type="cylinder" fromto=" 0.1 0 0  0.104 0 0"  size="0.017" material="steel_dark" density="7700"/>
-      <geom name="handle"     type="cylinder" fromto=" 0 0.01 0  0 0.11 0"  size="0.011" material="steel"      density="7700"/>
-      <geom name="handle_cap" type="cylinder" fromto=" 0 0.11 0  0 0.114 0" size="0.015" material="steel_dark" density="7700"/>
+      <geom name="bar"        type="cylinder" fromto="-0.1 0 0  0.1 0 0"    size="0.013" material="steel"      rgba="0.78 0.82 0.88 1" density="7700"/>
+      <geom name="bar_cap_l"  type="cylinder" fromto="-0.104 0 0 -0.1 0 0"  size="0.017" material="steel_dark" rgba="0.28 0.30 0.34 1" density="7700"/>
+      <geom name="bar_cap_r"  type="cylinder" fromto=" 0.1 0 0  0.104 0 0"  size="0.017" material="steel_dark" rgba="0.28 0.30 0.34 1" density="7700"/>
+      <geom name="handle"     type="cylinder" fromto=" 0 0.01 0  0 0.11 0"  size="0.011" material="steel"      rgba="0.78 0.82 0.88 1" density="7700"/>
+      <geom name="handle_cap" type="cylinder" fromto=" 0 0.11 0  0 0.114 0" size="0.015" material="steel_dark" rgba="0.28 0.30 0.34 1" density="7700"/>
     </body>
 
   </worldbody>

@@ -105,3 +105,17 @@ Outputs written to the same directory:
 | `rattleback_states.png` | Six-panel state plots |
 
 See [Setup & Installation](/setup/) for environment and dependency instructions.
+
+## Live Simulation
+
+<p id="mujoco-status" class="mujoco-status">Downloading MuJoCo WASM (~10 MB)&hellip;</p>
+
+<div id="mujoco-canvas-container">
+  <canvas id="mujoco-canvas"></canvas>
+</div>
+
+<div class="mujoco-controls">
+  <button id="mujoco-reset" class="btn-mujoco-reset" disabled>Reset</button>
+</div>
+
+<script type="module" src="{{ '/rattleback/rattleback.js' | relative_url }}"></script>

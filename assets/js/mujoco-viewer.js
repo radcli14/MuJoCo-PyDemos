@@ -33,6 +33,67 @@ function waitForSize(el) {
   });
 }
 
+// Strip <asset> blocks and material attributes before passing XML to the WASM
+// runtime, which cannot access local filesystem texture files.
+// rgba fallback values on each geom provide browser colors after stripping.
+function prepareXmlForWasm(xml) {
+  return xml
+    .replace(/<asset[\s\S]*?<\/asset>/g, '')
+    .replace(/\s*material="[^"]*"/g, '');
+}
+
+// Create a Three.js BufferGeometry for a given MuJoCo geom type.
+// Reads authoritative dimensions from model.geom_size (not mjvGeom.size,
+// which is unreliable for capsule/cylinder half-lengths).
+export function createGeometry(type, G, THREE, model, objid) {
+  if (type === G.mjGEOM_SPHERE.value)
+    return new THREE.SphereGeometry(model.geom_size[objid * 3], 32, 16);
+
+  if (type === G.mjGEOM_ELLIPSOID.value) {
+    // Three.js has no EllipsoidGeometry; bake semi-axes into vertex positions.
+    const geo = new THREE.SphereGeometry(1, 32, 16);
+    geo.applyMatrix4(new THREE.Matrix4().makeScale(
+      model.geom_size[objid * 3],
+      model.geom_size[objid * 3 + 1],
+      model.geom_size[objid * 3 + 2]
+    ));
+    return geo;
+  }
+
+  if (type === G.mjGEOM_PLANE.value) {
+    const pw = model.geom_size[objid * 3]     > 0 ? model.geom_size[objid * 3]     * 2 : 20;
+    const ph = model.geom_size[objid * 3 + 1] > 0 ? model.geom_size[objid * 3 + 1] * 2 : 20;
+    return new THREE.PlaneGeometry(pw, ph);
+  }
+
+  if (type === G.mjGEOM_BOX.value)
+    return new THREE.BoxGeometry(
+      model.geom_size[objid * 3]     * 2,
+      model.geom_size[objid * 3 + 1] * 2,
+      model.geom_size[objid * 3 + 2] * 2
+    );
+
+  if (type === G.mjGEOM_CYLINDER.value) {
+    const r  = model.geom_size[objid * 3];
+    const hl = model.geom_size[objid * 3 + 1];
+    const geo = new THREE.CylinderGeometry(r, r, hl * 2, 32);
+    // Three.js CylinderGeometry is Y-axis; MuJoCo cylinder is Z-axis.
+    geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+    return geo;
+  }
+
+  if (type === G.mjGEOM_CAPSULE.value) {
+    const r  = model.geom_size[objid * 3];
+    const hl = model.geom_size[objid * 3 + 1];
+    const geo = new THREE.CapsuleGeometry(r, hl * 2, 8, 16);
+    // Three.js CapsuleGeometry is Y-axis; MuJoCo capsule is Z-axis.
+    geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+    return geo;
+  }
+
+  return null;
+}
+
 export async function initMujocoViewer({
   xml,
   xmlUrl,          // URL/path to an .xml file; fetched and resolved to a string before model load
@@ -75,6 +136,7 @@ export async function initMujocoViewer({
       if (!resp.ok) throw new Error(`Failed to fetch model XML: ${resp.status}`);
       xml = await resp.text();
     }
+    xml = prepareXmlForWasm(xml);
     const model   = mj.MjModel.from_xml_string(xml);
     const data    = new mj.MjData(model);
     const mjScene = new mj.MjvScene(model, 1000);
@@ -129,40 +191,19 @@ export async function initMujocoViewer({
 
     function getMesh(i, g) {
       if (meshPool[i]) return meshPool[i];
-      const type = g.type, size = g.size, rgba = g.rgba;
-      let geo;
-      if      (type === G.mjGEOM_SPHERE.value)
-        geo = new THREE.SphereGeometry(size[0], 32, 16);
-      else if (type === G.mjGEOM_PLANE.value) {
-        const pw = size[0] > 0 ? size[0] * 2 : 20;
-        const ph = size[1] > 0 ? size[1] * 2 : 20;
-        geo = new THREE.PlaneGeometry(pw, ph);
+      const type = g.type, rgba = g.rgba;
+      // Skip fully transparent geoms (e.g. logo backdrop planes with rgba="0 0 0 0").
+      if (rgba[3] === 0) return null;
+      const geo = createGeometry(type, G, THREE, model, g.objid);
+      if (!geo) return null;
+
+      if (type === G.mjGEOM_PLANE.value) {
+        const pw = model.geom_size[g.objid * 3]     > 0 ? model.geom_size[g.objid * 3]     * 2 : 20;
+        const ph = model.geom_size[g.objid * 3 + 1] > 0 ? model.geom_size[g.objid * 3 + 1] * 2 : 20;
         // 1 m per checker cell: texture has 2 cells (one light, one dark) per repeat
         checkerTex.repeat.set(pw / 2, ph / 2);
         checkerTex.needsUpdate = true;
       }
-      else if (type === G.mjGEOM_BOX.value)
-        geo = new THREE.BoxGeometry(size[0]*2, size[1]*2, size[2]*2);
-      else if (type === G.mjGEOM_CYLINDER.value) {
-        const r  = size[0];
-        // g.size[1] from mjv_updateScene is unreliable; use model.geom_size directly.
-        const hl = model.geom_size[g.objid * 3 + 1];
-        geo = new THREE.CylinderGeometry(r, r, hl * 2, 32);
-        // Three.js CylinderGeometry is Y-axis; MuJoCo cylinder is Z-axis.
-        // Pre-rotate geometry +90° around X so applyPose maps correctly.
-        geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-      }
-      else if (type === G.mjGEOM_CAPSULE.value) {
-        const r = size[0];
-        // g.size[1] from mjv_updateScene is unreliable (may hold radius, not half-length).
-        // model.geom_size always holds the correct cylindrical half-length from the XML.
-        const hl = model.geom_size[g.objid * 3 + 1];
-        geo = new THREE.CapsuleGeometry(r, hl * 2, 8, 16);
-        // Three.js CapsuleGeometry is Y-axis; MuJoCo capsule is Z-axis.
-        geo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-      }
-      else
-        return null;
 
       const mat = (type === G.mjGEOM_PLANE.value)
         ? new THREE.MeshPhongMaterial({ map: checkerTex })
