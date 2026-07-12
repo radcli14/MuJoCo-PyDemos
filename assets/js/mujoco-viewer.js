@@ -36,10 +36,15 @@ function waitForSize(el) {
 // Strip <asset> blocks and material attributes before passing XML to the WASM
 // runtime, which cannot access local filesystem texture files.
 // rgba fallback values on each geom provide browser colors after stripping.
-function prepareXmlForWasm(xml) {
-  return xml
-    .replace(/<asset[\s\S]*?<\/asset>/g, '')
-    .replace(/\s*material="[^"]*"/g, '');
+export function prepareXmlForWasm(xml) {
+  // Use indexOf/slice to remove <asset>...</asset> — avoids any regex multiline edge cases.
+  let s = xml.indexOf('<asset'), e = xml.indexOf('</asset>');
+  while (s !== -1 && e !== -1) {
+    xml = xml.slice(0, s) + xml.slice(e + 8);
+    s = xml.indexOf('<asset'); e = xml.indexOf('</asset>');
+  }
+  // Remove material="..." attributes; rgba fallback values on geoms are used instead.
+  return xml.replace(/\s*material="[^"]*"/g, '');
 }
 
 // Create a Three.js BufferGeometry for a given MuJoCo geom type.
