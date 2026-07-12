@@ -111,3 +111,17 @@ python t_handle_sim.py
 | `t_handle_states.png` | Angular velocity time history and 3-D phase portrait |
 
 See [Setup & Installation](/setup/) for environment and dependency instructions.
+
+## Live Simulation
+
+<p id="mujoco-status" class="mujoco-status">Downloading MuJoCo WASM (~10 MB)&hellip;</p>
+
+<div id="mujoco-canvas-container">
+  <canvas id="mujoco-canvas"></canvas>
+</div>
+
+<div class="mujoco-controls">
+  <button id="mujoco-reset" class="btn-mujoco-reset" disabled>Reset</button>
+</div>
+
+<script type="module" src="{{ '/t_handle/t_handle.js' | relative_url }}"></script>
