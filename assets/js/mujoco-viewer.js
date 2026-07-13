@@ -163,7 +163,8 @@ export async function initMujocoViewer({
     }
 
     // Extract texture assignments from the asset block before stripping it.
-    const baseUrl = xmlUrl || location.href;
+    // Resolve xmlUrl to an absolute URL so relative texture paths in the XML can be resolved.
+    const baseUrl = new URL(xmlUrl || location.href, location.href).href;
     const geomNameToTexUrl = parseTextureMap(xml, baseUrl);
 
     xml = prepareXmlForWasm(xml);
