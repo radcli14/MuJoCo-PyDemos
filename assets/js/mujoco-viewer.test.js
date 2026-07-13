@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { createGeometry, prepareXmlForWasm } from './mujoco-viewer.js';
+import { createGeometry, prepareXmlForWasm, parseTextureMap } from './mujoco-viewer.js';
 
 // Minimal mjtGeom enum matching MuJoCo's mjtGeom values.
 const G = {
@@ -130,5 +130,47 @@ describe('prepareXmlForWasm', () => {
     const plain = '<mujoco><worldbody><geom type="plane"/></worldbody></mujoco>';
     const out = prepareXmlForWasm(plain);
     expect(out).toContain('<geom type="plane"');
+  });
+});
+
+describe('parseTextureMap', () => {
+  const BASE = 'https://example.com/mymodel/mymodel.xml';
+
+  const SAMPLE = `<mujoco>
+  <asset>
+    <texture name="shield_tex" type="2d" file="../images/logo.png"/>
+    <material name="logo_mat" texture="shield_tex"/>
+    <material name="other_mat" rgba="0.5 0.5 0.5 1"/>
+  </asset>
+  <worldbody>
+    <geom name="backdrop" type="plane" material="logo_mat"/>
+    <geom name="floor"    type="plane"/>
+    <geom name="ball"     type="sphere" material="other_mat"/>
+  </worldbody>
+</mujoco>`;
+
+  it('resolves the texture URL relative to the base URL', () => {
+    const map = parseTextureMap(SAMPLE, BASE);
+    expect(map['backdrop']).toBe('https://example.com/images/logo.png');
+  });
+
+  it('maps only geoms whose material references a texture with a file', () => {
+    const map = parseTextureMap(SAMPLE, BASE);
+    expect(Object.keys(map)).toEqual(['backdrop']);
+  });
+
+  it('ignores geoms with no material attribute', () => {
+    const map = parseTextureMap(SAMPLE, BASE);
+    expect(map['floor']).toBeUndefined();
+  });
+
+  it('ignores materials that have no texture attribute', () => {
+    const map = parseTextureMap(SAMPLE, BASE);
+    expect(map['ball']).toBeUndefined();
+  });
+
+  it('returns an empty object when there is no asset block', () => {
+    const plain = '<mujoco><worldbody><geom name="g" type="plane"/></worldbody></mujoco>';
+    expect(parseTextureMap(plain, BASE)).toEqual({});
   });
 });

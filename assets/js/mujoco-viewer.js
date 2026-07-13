@@ -47,6 +47,26 @@ export function prepareXmlForWasm(xml) {
   return xml.replace(/\s*material="[^"]*"/g, '');
 }
 
+// Parse the <asset> block of a MuJoCo XML to build a geomName → textureUrl map.
+// baseUrl is used to resolve relative file paths (typically the xmlUrl).
+// This must be called on the original XML before prepareXmlForWasm strips the asset block.
+export function parseTextureMap(xml, baseUrl) {
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const texFiles = {};
+  for (const t of doc.querySelectorAll('texture[file]'))
+    texFiles[t.getAttribute('name')] = new URL(t.getAttribute('file'), baseUrl).href;
+  const matTex = {};
+  for (const m of doc.querySelectorAll('material[texture]'))
+    matTex[m.getAttribute('name')] = m.getAttribute('texture');
+  const result = {};
+  for (const g of doc.querySelectorAll('geom[material]')) {
+    const texName = matTex[g.getAttribute('material')];
+    const url = texName && texFiles[texName];
+    if (url) result[g.getAttribute('name')] = url;
+  }
+  return result;
+}
+
 // Create a Three.js BufferGeometry for a given MuJoCo geom type.
 // Reads authoritative dimensions from model.geom_size (not mjvGeom.size,
 // which is unreliable for capsule/cylinder half-lengths).
@@ -141,6 +161,11 @@ export async function initMujocoViewer({
       if (!resp.ok) throw new Error(`Failed to fetch model XML: ${resp.status}`);
       xml = await resp.text();
     }
+
+    // Extract texture assignments from the asset block before stripping it.
+    const baseUrl = xmlUrl || location.href;
+    const geomNameToTexUrl = parseTextureMap(xml, baseUrl);
+
     xml = prepareXmlForWasm(xml);
     const model   = mj.MjModel.from_xml_string(xml);
     const data    = new mj.MjData(model);
@@ -190,6 +215,22 @@ export async function initMujocoViewer({
       await onSceneReady({ threeScene, THREE, ESM });
     }
 
+    // Pre-load all geom textures and map model geom IDs to Three.js Texture objects.
+    // Uses mj_name2id so any future model with <texture>/<material>/material= attributes
+    // on its geoms gets textures automatically without per-model JS code.
+    const geomTextures = new Map();
+    const mjObjGeom = mj.mjtObj.mjOBJ_GEOM.value;
+    const loader = new THREE.TextureLoader();
+    await Promise.all(
+      Object.entries(geomNameToTexUrl).map(([name, url]) => {
+        const id = mj.mj_name2id(model, mjObjGeom, name);
+        if (id < 0) return Promise.resolve();
+        return new Promise(resolve =>
+          loader.load(url, tex => { geomTextures.set(id, tex); resolve(); }, null, resolve)
+        );
+      })
+    );
+
     const checkerTex = makeCheckerTexture(THREE);
     const meshPool   = [];
     const G          = mj.mjtGeom;
@@ -197,25 +238,28 @@ export async function initMujocoViewer({
     function getMesh(i, g) {
       if (meshPool[i]) return meshPool[i];
       const type = g.type, rgba = g.rgba;
-      // Skip fully transparent geoms (e.g. logo backdrop planes with rgba="0 0 0 0").
-      if (rgba[3] === 0) return null;
+      const tex = geomTextures.get(g.objid);
+      // Skip fully transparent geoms unless they carry a texture.
+      if (rgba[3] === 0 && !tex) return null;
       const geo = createGeometry(type, G, THREE, model, g.objid);
       if (!geo) return null;
 
-      if (type === G.mjGEOM_PLANE.value) {
+      let mat;
+      if (tex) {
+        mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide });
+      } else if (type === G.mjGEOM_PLANE.value) {
         const pw = model.geom_size[g.objid * 3]     > 0 ? model.geom_size[g.objid * 3]     * 2 : 20;
         const ph = model.geom_size[g.objid * 3 + 1] > 0 ? model.geom_size[g.objid * 3 + 1] * 2 : 20;
         // 1 m per checker cell: texture has 2 cells (one light, one dark) per repeat
         checkerTex.repeat.set(pw / 2, ph / 2);
         checkerTex.needsUpdate = true;
+        mat = new THREE.MeshPhongMaterial({ map: checkerTex });
+      } else {
+        mat = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(rgba[0], rgba[1], rgba[2]),
+          opacity: rgba[3], transparent: rgba[3] < 0.99
+        });
       }
-
-      const mat = (type === G.mjGEOM_PLANE.value)
-        ? new THREE.MeshPhongMaterial({ map: checkerTex })
-        : new THREE.MeshPhongMaterial({
-            color: new THREE.Color(rgba[0], rgba[1], rgba[2]),
-            opacity: rgba[3], transparent: rgba[3] < 0.99
-          });
 
       const mesh = new THREE.Mesh(geo, mat);
       mesh.matrixAutoUpdate = false;
