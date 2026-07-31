@@ -24,6 +24,19 @@
     - angular momentum
     - gyroscopic coupling
 
+- id: four_bar_linkage
+  title: "Four-Bar Linkage"
+  description: >-
+    Three moving links — crank, coupler, and follower — connected by pin joints
+    and closed through MuJoCo's equality constraint solver. The mechanism
+    oscillates under gravity from a near-Grashof initial configuration.
+  url: /four_bar_linkage/
+  thumbnail: /four_bar_linkage/four_bar_linkage_states_thumb.png
+  tags:
+    - mechanisms
+    - kinematics
+    - constraints
+
 - id: t_handle
   title: "T-Handle"
   description: >-
