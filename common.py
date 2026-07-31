@@ -78,3 +78,19 @@ def save_video(frames, path, fps=60):
         writer.append_data(frame)
     writer.close()
     print(f"  {len(frames)} frames written.")
+
+
+def save_thumbnail(plot_path, quality="70-85"):
+    """Generate a compressed thumbnail alongside a plot PNG using pngquant."""
+    import subprocess
+    from pathlib import Path
+    plot_path = Path(plot_path)
+    thumb_path = plot_path.with_name(plot_path.stem + "_thumb" + plot_path.suffix)
+    result = subprocess.run(
+        ["pngquant", f"--quality={quality}", "--output", str(thumb_path), "--force", str(plot_path)],
+        capture_output=True,
+    )
+    if result.returncode == 0:
+        print(f"  Thumbnail saved → {thumb_path}")
+    else:
+        print(f"  pngquant not available; skipping thumbnail.")

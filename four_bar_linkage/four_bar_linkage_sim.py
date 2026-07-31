@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import common                                                       # noqa: E402
 from common import (Palette, style_ax, make_free_camera,            # noqa: E402
-                    save_video, steps_per_frame, plt)
+                    save_video, save_thumbnail, steps_per_frame, plt)
 
 import numpy as np                                                  # noqa: E402
 import mujoco                                                       # noqa: E402
@@ -220,3 +220,4 @@ if __name__ == "__main__":
     times, theta, omega, energy, frames = run_simulation()
     save_video(frames, VIDEO_PATH, RENDER_FPS)
     plot_states(times, theta, omega, energy)
+    save_thumbnail(PLOT_PATH)
