@@ -71,14 +71,16 @@ The follower joint uses $+y$ because its body extends in the $-x$ direction from
 The loop-closure equation is enforced by a MuJoCo `<connect>` equality constraint, which drives the coupler tip and follower tip to coincide:
 
 ```xml
+<site name="coupler_tip"  pos="2 0 0"/>   <!-- in coupler body: 2 m along +x from pivot P₁ -->
+<site name="follower_tip" pos="-3 0 0"/>  <!-- in follower body: 3 m along −x from pivot P₃ -->
+
 <equality>
-  <connect body1="coupler" anchor1="2 0 0" body2="follower" anchor2="-3 0 0"/>
+  <connect site1="coupler_tip" site2="follower_tip"/>
 </equality>
 ```
 
-`anchor1="2 0 0"` is the tip of the coupler in the coupler body frame (2 m along +x from the coupler pivot P₁).
-`anchor2="-3 0 0"` is the tip of the follower in the follower body frame (3 m along −x from follower pivot P₃).
-MuJoCo's constraint solver enforces this pin joint at every time step via a velocity-level correction plus a Baumgarte stabilization force, keeping the linkage closed without any explicit position-level correction loop in the user code.
+Named sites define the attachment points in each body's local frame; `<connect>` then constrains those two world-frame positions to be equal at all times.
+MuJoCo's constraint solver enforces this pin joint via a velocity-level correction plus a Baumgarte stabilization force, keeping the linkage closed without any explicit position-level correction loop in user code.
 
 ### Inertia
 
