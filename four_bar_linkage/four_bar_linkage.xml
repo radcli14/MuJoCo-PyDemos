@@ -62,6 +62,7 @@
         <geom name="pin2" type="cylinder" pos="2 0 0" euler="90 0 0"
               size="0.07 0.055" material="pin_mat" rgba="0.62 0.66 0.72 1"
               density="0" contype="0" conaffinity="0"/>
+        <site name="coupler_tip" pos="2 0 0"/>
       </body>
     </body>
 
@@ -74,14 +75,14 @@
       <geom name="follower_link" type="capsule" fromto="0 0 0  -3 0 0"
             size="0.04" material="follower_mat" rgba="0.20 0.40 0.92 1"
             density="0" contype="0" conaffinity="0"/>
+      <site name="follower_tip" pos="-3 0 0"/>
     </body>
 
   </worldbody>
 
-  <!-- Close the four-bar loop: coupler tip and follower tip must coincide.
-       anchor1=(2,0,0) in the coupler frame; anchor2=(-3,0,0) in the follower frame. -->
+  <!-- Close the four-bar loop: coupler tip and follower tip must coincide. -->
   <equality>
-    <connect body1="coupler" anchor1="2 0 0" body2="follower" anchor2="-3 0 0"/>
+    <connect site1="coupler_tip" site2="follower_tip"/>
   </equality>
 
 </mujoco>
