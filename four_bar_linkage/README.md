@@ -5,7 +5,7 @@ title: "Four-Bar Linkage"
 subtitle: "Closed-loop planar mechanism with an equality constraint"
 description: >-
   Three moving links — crank, coupler, and follower — connected by pin joints and closed through an equality constraint enforced by MuJoCo's constraint solver.
-  The mechanism oscillates under gravity from an initial near-Grashof configuration, tracking position, angular velocity, and mechanical energy over 20 seconds.
+  Starting from rest, the crank rotates continuously under gravity — a Grashof crank-rocker at the change-point boundary — while position, angular velocity, and mechanical energy are tracked over 20 seconds.
 date: 2026-07-31
 plot_image: /four_bar_linkage/four_bar_linkage_states.png
 plot_image_thumb: /four_bar_linkage/four_bar_linkage_states_thumb.png
@@ -46,7 +46,7 @@ $$l_\text{min} + l_\text{max} \leq l_1 + l_2 \quad \Rightarrow \quad 1 + 4 = 2 +
 
 This linkage sits exactly on the Grashof boundary (equality), making it a *change-point* mechanism.
 With the ground link as the longest and the crank as the shortest, it would theoretically permit full crank rotation, but the mechanism passes through collinear (folded) configurations at the change points.
-Starting at $\theta_0 = 85°$ with all velocities zero, the system oscillates rather than completing full rotations — gravity alone drives the motion.
+Starting at $\theta_0 = 85°$ with all velocities zero, gravity drives the crank through continuous full rotations — the mechanism is on the Grashof boundary where the shortest link (crank) is adjacent to the ground link, enabling unrestricted rotation.
 
 ## MJCF Model
 

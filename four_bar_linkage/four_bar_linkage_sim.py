@@ -87,15 +87,15 @@ def run_simulation():
         # Mechanical energy (thin-rod model, Z-up gravity)
         z0 = 0.5 * L[0] * np.sin(th0)                          # crank CG height
         z1 = L[0]*np.sin(th0) + 0.5*L[1]*np.sin(th1)           # coupler CG height
-        z2 = -1.5*L[2]*np.sin(th2)                             # follower CG height (from P₃)
+        z2 = -0.5*L[2]*np.sin(th2)                             # follower CG height (from P₃)
 
         # Linear velocities of each CG (planar: x-z components only)
         vx0 = -0.5*L[0]*omega[i,0]*np.sin(th0)
         vz0 =  0.5*L[0]*omega[i,0]*np.cos(th0)
         vx1 = -L[0]*omega[i,0]*np.sin(th0) - 0.5*L[1]*omega[i,1]*np.sin(th1)
         vz1 =  L[0]*omega[i,0]*np.cos(th0) + 0.5*L[1]*omega[i,1]*np.cos(th1)
-        vx2 =  1.5*L[2]*omega[i,2]*np.sin(th2)
-        vz2 = -1.5*L[2]*omega[i,2]*np.cos(th2)
+        vx2 =  0.5*L[2]*omega[i,2]*np.sin(th2)
+        vz2 = -0.5*L[2]*omega[i,2]*np.cos(th2)
 
         KE = (0.5*M[0]*(vx0**2+vz0**2) + 0.5*I_rod[0]*omega[i,0]**2
             + 0.5*M[1]*(vx1**2+vz1**2) + 0.5*I_rod[1]*omega[i,1]**2
