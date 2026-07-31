@@ -1,0 +1,87 @@
+<mujoco model="four_bar_linkage">
+
+  <option gravity="0 0 -9.81" integrator="RK4" timestep="0.001"/>
+
+  <visual>
+    <headlight diffuse="0.55 0.55 0.55" ambient="0.30 0.30 0.30" specular="0.10 0.10 0.10"/>
+    <global offwidth="1280" offheight="720"/>
+  </visual>
+
+  <asset>
+    <!-- DC Engineer shield logo — static backdrop -->
+    <texture name="shield_tex" type="2d" file="../images/dc-engineer-logo-transparent.png"/>
+    <material name="logo_mat"     texture="shield_tex" texrepeat="1 1" rgba="1 1 1 1"/>
+
+    <material name="ground_mat"   rgba="0.30 0.30 0.32 1.00"/>
+    <material name="crank_mat"    rgba="0.88 0.16 0.16 1.00" reflectance="0.20" shininess="0.60"/>
+    <material name="coupler_mat"  rgba="0.20 0.78 0.24 1.00" reflectance="0.20" shininess="0.60"/>
+    <material name="follower_mat" rgba="0.20 0.40 0.92 1.00" reflectance="0.20" shininess="0.60"/>
+    <material name="pin_mat"      rgba="0.62 0.66 0.72 1.00" reflectance="0.60" shininess="1.00"/>
+  </asset>
+
+  <worldbody>
+
+    <!-- DC Engineer shield logo — static backdrop, faces camera at azimuth 180 -->
+    <body name="backdrop" pos="2 0.3 1.0">
+      <geom name="logo_panel" type="plane" size="2.2 2.2 0.1"
+            pos="0 0 0" euler="90 180 0"
+            material="logo_mat" rgba="0 0 0 0" contype="0" conaffinity="0"/>
+    </body>
+
+    <!-- Fixed ground link from crank pivot P₀=(0,0,0) to follower pivot P₃=(l₃,0,0) -->
+    <geom name="ground_link" type="capsule" fromto="0 0 0  4 0 0"
+          size="0.04" material="ground_mat" rgba="0.30 0.30 0.32 1"
+          density="0" contype="0" conaffinity="0"/>
+    <geom name="pin0" type="cylinder" pos="0 0 0" euler="90 0 0"
+          size="0.07 0.055" material="pin_mat" rgba="0.62 0.66 0.72 1"
+          density="0" contype="0" conaffinity="0"/>
+    <geom name="pin3" type="cylinder" pos="4 0 0" euler="90 0 0"
+          size="0.07 0.055" material="pin_mat" rgba="0.62 0.66 0.72 1"
+          density="0" contype="0" conaffinity="0"/>
+
+    <!-- Crank (l₀ = 1 m, m₀ = 1 kg). Pivot at P₀; link extends along +x at θ₀ = 0.
+         Rotates about the −y axis so positive angles sweep toward +z (upward). -->
+    <body name="crank" pos="0 0 0">
+      <joint name="j0" type="hinge" axis="0 -1 0"/>
+      <inertial pos="0.5 0 0" mass="1" diaginertia="0.001 0.0833 0.0833"/>
+      <geom name="crank_link" type="capsule" fromto="0 0 0  1 0 0"
+            size="0.04" material="crank_mat" rgba="0.88 0.16 0.16 1"
+            density="0" contype="0" conaffinity="0"/>
+      <geom name="pin1" type="cylinder" pos="1 0 0" euler="90 0 0"
+            size="0.07 0.055" material="pin_mat" rgba="0.62 0.66 0.72 1"
+            density="0" contype="0" conaffinity="0"/>
+
+      <!-- Coupler (l₁ = 2 m, m₁ = 2 kg). Pivot at crank tip P₁; link extends along +x.
+           Joint angle is relative to the crank body frame. -->
+      <body name="coupler" pos="1 0 0">
+        <joint name="j1" type="hinge" axis="0 -1 0"/>
+        <inertial pos="1 0 0" mass="2" diaginertia="0.001 0.6667 0.6667"/>
+        <geom name="coupler_link" type="capsule" fromto="0 0 0  2 0 0"
+              size="0.04" material="coupler_mat" rgba="0.20 0.78 0.24 1"
+              density="0" contype="0" conaffinity="0"/>
+        <geom name="pin2" type="cylinder" pos="2 0 0" euler="90 0 0"
+              size="0.07 0.055" material="pin_mat" rgba="0.62 0.66 0.72 1"
+              density="0" contype="0" conaffinity="0"/>
+      </body>
+    </body>
+
+    <!-- Follower (l₂ = 3 m, m₂ = 3 kg). Pivot at P₃=(l₃,0,0); link extends toward crank (−x).
+         Rotates about +y so that positive angles sweep toward +z, matching the crank/coupler
+         convention when the link direction is reversed. -->
+    <body name="follower" pos="4 0 0">
+      <joint name="j2" type="hinge" axis="0 1 0"/>
+      <inertial pos="-1.5 0 0" mass="3" diaginertia="0.001 2.25 2.25"/>
+      <geom name="follower_link" type="capsule" fromto="0 0 0  -3 0 0"
+            size="0.04" material="follower_mat" rgba="0.20 0.40 0.92 1"
+            density="0" contype="0" conaffinity="0"/>
+    </body>
+
+  </worldbody>
+
+  <!-- Close the four-bar loop: coupler tip and follower tip must coincide.
+       anchor1=(2,0,0) in the coupler frame; anchor2=(-3,0,0) in the follower frame. -->
+  <equality>
+    <connect body1="coupler" anchor1="2 0 0" body2="follower" anchor2="-3 0 0"/>
+  </equality>
+
+</mujoco>
